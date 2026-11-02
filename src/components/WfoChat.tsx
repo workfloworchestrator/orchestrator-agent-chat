@@ -8,6 +8,7 @@ import { ChatList } from "./ChatList";
 import { Composer } from "./Composer";
 import { Mark } from "./Mark";
 import { Messages } from "./Messages";
+import { Shadow } from "./Shadow";
 import { StopCard } from "./StopCard";
 import { ICON_BUTTON, PRIMARY } from "./classes";
 
@@ -111,133 +112,145 @@ export function WfoChat({
         : null;
 
   return (
-    <div className="wfo-chat contents scheme-light dark:scheme-dark" data-theme={theme === "auto" ? undefined : theme}>
-      {open && (
-        <section
-          className={`${LAYER} right-4 bottom-20 flex origin-bottom-right flex-col overflow-hidden rounded-[20px] border border-wfo-line bg-wfo-bg font-wfo text-wfo-ink shadow-wfo-panel motion-safe:animate-wfo-pop ${
-            wide ? "w-[min(900px,calc(100vw-2rem))]" : "w-[min(380px,calc(100vw-2rem))]"
-          } h-[min(640px,calc(100vh-6rem))]`}
-          role="dialog"
-          aria-label={title}
-        >
-          <header className="flex items-center gap-2 border-b border-wfo-line px-3 py-2.5">
-            {inChat ? (
-              <button type="button" className={ICON_BUTTON} title="Your chats" onClick={() => setView("chats")}>
-                <ChevronLeft size={18} />
-              </button>
-            ) : (
-              <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-wfo-mark text-wfo-on-mark">
-                <Mark size={20} />
-              </span>
-            )}
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-sm leading-5 font-semibold">{inChat ? chatTitle : title}</div>
-              <div className="flex items-center gap-1.5 text-xs leading-4 text-wfo-muted">
-                {inChat && status ? (
-                  <>
-                    <span className={`inline-block h-1.5 w-1.5 rounded-full ${status.tone}`} />
-                    {status.text}
-                  </>
-                ) : inChat ? (
-                  title
-                ) : (
-                  "Your chats"
-                )}
-              </div>
-            </div>
-            {inChat && (
-              <button type="button" className={ICON_BUTTON} title="New chat" onClick={newChat}>
-                <Plus size={18} />
-              </button>
-            )}
-            <button
-              type="button"
-              className={ICON_BUTTON}
-              title={wide ? "Narrow" : "Widen"}
-              onClick={() => setWide((w) => !w)}
-            >
-              {wide ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
-            </button>
-            <button type="button" className={ICON_BUTTON} title="Close" onClick={() => setOpen(false)}>
-              <X size={18} />
-            </button>
-          </header>
-
-          {/* Keyed per screen: the list starts at the top and a chat at its end, never where the other screen left off. */}
-          <div
-            key={inChat ? "chat" : "chats"}
-            className="flex-1 [scrollbar-width:thin] [scrollbar-color:var(--color-wfo-line)_transparent] overflow-y-auto px-4 py-3"
-          >
-            {inChat ? (
-              <>
-                <Messages messages={chat.messages} running={chat.running} suggestions={suggestions} onSuggest={send} />
-                {chat.interrupts.map((interrupt) => (
-                  <div key={interrupt.id} className="mt-3">
-                    <StopCard
-                      interrupt={interrupt}
-                      busy={chat.running}
-                      search={chat.searchOptions}
-                      onResolve={(payload) =>
-                        void chat.respond([{ interruptId: interrupt.id, status: "resolved", payload }])
-                      }
-                      onCancel={() => void chat.respond([{ interruptId: interrupt.id, status: "cancelled" }])}
-                    />
-                  </div>
-                ))}
-              </>
-            ) : (
-              <ChatList
-                chats={chat.chats}
-                loading={chat.loading}
-                onOpen={openChat}
-                onDelete={(id) => void chat.deleteChat(id)}
-                onNew={newChat}
-              />
-            )}
-          </div>
-
-          {chat.error && (
-            <div className="mx-3 mb-2 rounded-lg bg-wfo-danger-soft px-3 py-2 text-xs leading-4 text-wfo-danger">
-              {chat.error}
-            </div>
-          )}
-
-          {inChat ? (
-            <div className="border-t border-wfo-line p-3">
-              <Composer
-                inputRef={input}
-                placeholder={
-                  chat.interrupts.length ? "Answer above, or type to leave the form" : "Ask the Workflow Orchestrator…"
-                }
-                running={chat.running}
-                onSend={send}
-                onStop={chat.stop}
-              />
-            </div>
-          ) : (
-            <div className="border-t border-wfo-line p-3">
-              <button type="button" className={`${PRIMARY} w-full`} onClick={newChat}>
-                <Plus size={16} /> New chat
-              </button>
-            </div>
-          )}
-        </section>
-      )}
-
-      <button
-        type="button"
-        onClick={() => {
-          setOpen((o) => !o);
-          setUnread(false);
-        }}
-        title={open ? `Close ${title}` : `Open ${title}`}
-        className={`${LAYER} right-4 bottom-4 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full border-0 bg-wfo-mark p-0 text-wfo-on-mark shadow-wfo-launcher hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wfo-accent`}
+    <Shadow>
+      <div
+        className="wfo-chat contents scheme-light dark:scheme-dark"
+        data-theme={theme === "auto" ? undefined : theme}
       >
-        {open ? <X size={22} /> : <Mark size={28} />}
-        {unread && !open && (
-          <span className="absolute top-1 right-1 h-3 w-3 rounded-full bg-wfo-wait ring-2 ring-wfo-bg" />
+        {open && (
+          <section
+            className={`${LAYER} right-4 bottom-20 flex origin-bottom-right flex-col overflow-hidden rounded-[20px] border border-wfo-line bg-wfo-bg font-wfo text-wfo-ink shadow-wfo-panel motion-safe:animate-wfo-pop ${
+              wide ? "w-[min(900px,calc(100vw-2rem))]" : "w-[min(380px,calc(100vw-2rem))]"
+            } h-[min(640px,calc(100vh-6rem))]`}
+            role="dialog"
+            aria-label={title}
+          >
+            <header className="flex items-center gap-2 border-b border-wfo-line px-3 py-2.5">
+              {inChat ? (
+                <button type="button" className={ICON_BUTTON} title="Your chats" onClick={() => setView("chats")}>
+                  <ChevronLeft size={18} />
+                </button>
+              ) : (
+                <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-wfo-mark text-wfo-on-mark">
+                  <Mark size={20} />
+                </span>
+              )}
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-sm leading-5 font-semibold">{inChat ? chatTitle : title}</div>
+                <div className="flex items-center gap-1.5 text-xs leading-4 text-wfo-muted">
+                  {inChat && status ? (
+                    <>
+                      <span className={`inline-block h-1.5 w-1.5 rounded-full ${status.tone}`} />
+                      {status.text}
+                    </>
+                  ) : inChat ? (
+                    title
+                  ) : (
+                    "Your chats"
+                  )}
+                </div>
+              </div>
+              {inChat && (
+                <button type="button" className={ICON_BUTTON} title="New chat" onClick={newChat}>
+                  <Plus size={18} />
+                </button>
+              )}
+              <button
+                type="button"
+                className={ICON_BUTTON}
+                title={wide ? "Narrow" : "Widen"}
+                onClick={() => setWide((w) => !w)}
+              >
+                {wide ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+              </button>
+              <button type="button" className={ICON_BUTTON} title="Close" onClick={() => setOpen(false)}>
+                <X size={18} />
+              </button>
+            </header>
+
+            {/* Keyed per screen: the list starts at the top and a chat at its end, never where the other screen left off. */}
+            <div
+              key={inChat ? "chat" : "chats"}
+              className="flex-1 [scrollbar-width:thin] [scrollbar-color:var(--color-wfo-line)_transparent] overflow-y-auto px-4 py-3"
+            >
+              {inChat ? (
+                <>
+                  <Messages
+                    messages={chat.messages}
+                    running={chat.running}
+                    suggestions={suggestions}
+                    onSuggest={send}
+                  />
+                  {chat.interrupts.map((interrupt) => (
+                    <div key={interrupt.id} className="mt-3">
+                      <StopCard
+                        interrupt={interrupt}
+                        busy={chat.running}
+                        search={chat.searchOptions}
+                        onResolve={(payload) =>
+                          void chat.respond([{ interruptId: interrupt.id, status: "resolved", payload }])
+                        }
+                        onCancel={() => void chat.respond([{ interruptId: interrupt.id, status: "cancelled" }])}
+                      />
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <ChatList
+                  chats={chat.chats}
+                  loading={chat.loading}
+                  onOpen={openChat}
+                  onDelete={(id) => void chat.deleteChat(id)}
+                  onNew={newChat}
+                />
+              )}
+            </div>
+
+            {chat.error && (
+              <div className="mx-3 mb-2 rounded-lg bg-wfo-danger-soft px-3 py-2 text-xs leading-4 text-wfo-danger">
+                {chat.error}
+              </div>
+            )}
+
+            {inChat ? (
+              <div className="border-t border-wfo-line p-3">
+                <Composer
+                  inputRef={input}
+                  placeholder={
+                    chat.interrupts.length
+                      ? "Answer above, or type to leave the form"
+                      : "Ask the Workflow Orchestrator…"
+                  }
+                  running={chat.running}
+                  onSend={send}
+                  onStop={chat.stop}
+                />
+              </div>
+            ) : (
+              <div className="border-t border-wfo-line p-3">
+                <button type="button" className={`${PRIMARY} w-full`} onClick={newChat}>
+                  <Plus size={16} /> New chat
+                </button>
+              </div>
+            )}
+          </section>
         )}
-      </button>
-    </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            setOpen((o) => !o);
+            setUnread(false);
+          }}
+          title={open ? `Close ${title}` : `Open ${title}`}
+          className={`${LAYER} right-4 bottom-4 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full border-0 bg-wfo-mark p-0 text-wfo-on-mark shadow-wfo-launcher hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wfo-accent`}
+        >
+          {open ? <X size={22} /> : <Mark size={28} />}
+          {unread && !open && (
+            <span className="absolute top-1 right-1 h-3 w-3 rounded-full bg-wfo-wait ring-2 ring-wfo-bg" />
+          )}
+        </button>
+      </div>
+    </Shadow>
   );
 }

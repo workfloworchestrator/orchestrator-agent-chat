@@ -8,9 +8,7 @@
     "url": "git+https://github.com/workfloworchestrator/orchestrator-agent-chat.git"
   },
   "type": "module",
-  "sideEffects": [
-    "**/*.css"
-  ],
+  "sideEffects": false,
   "files": [
     "dist"
   ],
@@ -21,8 +19,7 @@
     ".": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/wfo-chat.js"
-    },
-    "./style.css": "./dist/wfo-chat.css"
+    }
   },
   "publishConfig": {
     "access": "public",

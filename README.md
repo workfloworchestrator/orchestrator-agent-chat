@@ -13,13 +13,15 @@ npm install @workfloworchestrator/wfo-chat
 
 ```tsx
 import { WfoChat } from "@workfloworchestrator/wfo-chat";
-import "@workfloworchestrator/wfo-chat/style.css";
 
 <WfoChat agentUrl="/agui/" token={accessToken} context={[{ description: "The subscription on screen", value: id }]} />;
 ```
 
 On a page that is not React, `mountWfoChat(props)` renders the same popup and returns the function that
 removes it again.
+
+The popup renders inside a shadow root with its stylesheet, so the page's styles (a reset, a focus ring on
+every element) do not reach it, and nothing of its own reaches the page. There is no stylesheet to import.
 
 The popup needs the agent's AG-UI route and its chats API, by default `/agui/` and `/chats` on the page's
 own origin: put a proxy in front of the page (the demo's nginx config is one), or point `agentUrl` at the
@@ -49,18 +51,16 @@ the pick is the answer. A list question keeps every pick as a chip.
 
 ### Theming
 
-The look is a Tailwind theme (`src/styles/theme.css`) compiled into the stylesheet: a few colour tokens,
-a typeface, two shadows and two animations. A host page retunes it by overriding the variables on `:root`,
-and gives it its own typeface through `--font-wfo`:
+The look is a Tailwind theme (`src/styles/theme.css`): a few colour tokens, a typeface, two shadows and two
+animations. Custom properties are inherited into the shadow root, so a host page retunes the popup by setting
+the variables on the popup's element, `wfo-chat-host`, and gives it its own typeface through `--font-wfo`:
 
 ```css
-:root {
+.wfo-chat-host {
   --color-wfo-accent: #1d4ed8;
   --font-wfo: "Inter", sans-serif;
 }
 ```
-
-The stylesheet carries no reset and no element rules, so it does not restyle the page it is dropped into.
 
 ## Develop it
 
@@ -105,8 +105,8 @@ running agent, the agent checkout writes it directly:
 npm run contract
 ```
 
-`npm run build` writes the package to `dist/` (one ES module, one stylesheet, type declarations; React is a
-peer dependency and the other dependencies stay the host's). It also runs as the `prepare` script, so the
+`npm run build` writes the package to `dist/` (one ES module with the stylesheet inside, type declarations;
+React is a peer dependency and the other dependencies stay the host's). It also runs as the `prepare` script, so the
 package installs straight from git: `npm install github:workfloworchestrator/orchestrator-agent-chat`.
 
 ## Release

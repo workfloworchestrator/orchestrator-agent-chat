@@ -8,12 +8,12 @@ import pkg from "./package.json" with { type: "json" };
 
 const here = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
-// The package: one ES module and one stylesheet (the types come from tsc). React and the
-// dependencies stay the host's, installed once and deduplicated with its own.
+// The package: one ES module with the stylesheet inside it, for the shadow root the popup opens (the types
+// come from tsc). React and the dependencies stay the host's, installed once and deduplicated with its own.
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
-    lib: { entry: here("./src/index.ts"), formats: ["es"], fileName: "wfo-chat", cssFileName: "wfo-chat" },
+    lib: { entry: here("./src/index.ts"), formats: ["es"], fileName: "wfo-chat" },
     rollupOptions: {
       external: [
         /^react($|\/)/,
