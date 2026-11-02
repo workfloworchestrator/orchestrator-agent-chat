@@ -15,7 +15,11 @@ export default defineConfig({
   build: {
     lib: { entry: here("./src/index.ts"), formats: ["es"], fileName: "wfo-chat", cssFileName: "wfo-chat" },
     rollupOptions: {
-      external: ["react", "react-dom", "react/jsx-runtime", ...Object.keys(pkg.dependencies), /^@ag-ui\//],
+      external: [
+        /^react($|\/)/,
+        /^react-dom($|\/)/,
+        ...Object.keys(pkg.dependencies).map((d) => new RegExp(`^${d}($|/)`)),
+      ],
     },
     outDir: "dist",
   },
