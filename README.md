@@ -109,6 +109,20 @@ npm run contract
 peer dependency and the other dependencies stay the host's). It also runs as the `prepare` script, so the
 package installs straight from git: `npm install github:workfloworchestrator/orchestrator-agent-chat`.
 
+## Release
+
+The package is published to npm by CI: every merge to `main` publishes the version `package.json` names, once.
+To release, in the pull request: set the version (`npm version minor --no-git-tag-version`, or edit it), move
+the changelog's _Unreleased_ entries under that version, and merge. A merge that leaves the version as it is
+publishes nothing. Published versions carry [provenance](https://docs.npmjs.com/generating-provenance-statements)
+linking them to the workflow run that built them.
+
+Authentication is npm's [trusted publishing](https://docs.npmjs.com/trusted-publishers), so no token is kept
+in the repository. It is configured once, by an owner of the `@workfloworchestrator` organisation on npm, after
+the first version is published by hand from a logged-in checkout (`npm publish`): on the package's page on
+npmjs.com, _Settings_ → _Trusted publisher_ → GitHub Actions, organisation `workfloworchestrator`, repository
+`orchestrator-agent-chat`, workflow `ci.yml`. From then on the `publish` job of that workflow publishes.
+
 ## Licence
 
 Apache 2.0, see `LICENSE`.

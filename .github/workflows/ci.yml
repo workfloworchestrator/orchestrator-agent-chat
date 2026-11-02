@@ -17,3 +17,31 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+
+  publish:
+    # Every merge to main publishes the version package.json names, once: a merge that leaves the version
+    # as it is publishes nothing. Authentication is npm's trusted publishing (OIDC from this workflow), set
+    # up once on npmjs.com; no token is stored here. See README, "Release".
+    name: Publish to npm
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Publish, unless this version is on npm already
+        run: |
+          name=$(npm pkg get name | tr -d '"')
+          version=$(npm pkg get version | tr -d '"')
+          if npm view "$name@$version" version >/dev/null 2>&1; then
+            echo "$name@$version is already published; nothing to do"
+          else
+            npm publish
+          fi
