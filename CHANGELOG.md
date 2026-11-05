@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `colors` hands the popup a host's own theme, for the mode `theme` names: each colour given wins over the
+  popup's own, in light and dark alike. The WFO UI passes EUI's theme through it.
 - The theme follows the WFO UI: its colours in light and dark, Inter, and its 4px corners on controls and
   cards. `--color-wfo-accent-text` is new, for words and icons in the accent.
 - The popup wears the Workflow Orchestrator logo, in its header, its empty chats list and its launcher, and

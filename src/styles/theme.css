@@ -22,7 +22,8 @@
 
 /*
  * The popup's look is its theme: bg-wfo-accent, text-wfo-ink, border-wfo-line, font-wfo, ... A host page
- * retunes it by overriding these variables on .wfo-chat-host, and gives it its own typeface through --font-wfo.
+ * retunes it by overriding these variables on .wfo-chat-host, or passes `colors` to the component, which sets
+ * them on the popup's root and so wins in the dark too; it gives the popup its own typeface through --font-wfo.
  *
  * The values follow the WFO UI, so that the popup looks at home in it: wfoThemeModifications.ts in
  * orchestrator-ui-library and, where that leaves a colour alone, EUI's Borealis. The name each one comes from

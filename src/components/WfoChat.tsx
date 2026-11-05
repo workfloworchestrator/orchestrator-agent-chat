@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { ChevronLeft, Maximize2, MessageSquare, Minimize2, Plus, X } from "lucide-react";
 
 import type { AgentContext } from "../api/types";
@@ -11,6 +11,43 @@ import { Messages } from "./Messages";
 import { Shadow } from "./Shadow";
 import { StopCard } from "./StopCard";
 import { ICON_BUTTON, PRIMARY } from "./classes";
+
+/**
+ * The popup's colours, each a CSS colour. A host with a theme of its own passes the ones it has; the rest keep
+ * the popup's own values, which follow the WFO UI.
+ */
+export interface WfoChatColors {
+  /** The panel's background. */
+  bg: string;
+  /** A surface on it: a hover, a chip, a code block. */
+  surface: string;
+  /** Borders and dividers. */
+  line: string;
+  /** Text. */
+  ink: string;
+  /** Secondary text. */
+  muted: string;
+  /** The brand colour as a fill: buttons, the working dot. */
+  accent: string;
+  /** The fill's hover. */
+  accentStrong: string;
+  /** The brand colour for words and icons, dark enough to read. */
+  accentText: string;
+  /** A field tinted in the brand colour. */
+  accentSoft: string;
+  /** Text on the fill. */
+  onAccent: string;
+  /** The field behind the mark: the header's badge, the launcher. */
+  mark: string;
+  /** What is drawn on that field, such as the launcher's close icon. */
+  onMark: string;
+  /** Waiting for the person: a form open, a step paused. */
+  wait: string;
+  waitSoft: string;
+  /** An error. */
+  danger: string;
+  dangerSoft: string;
+}
 
 export interface WfoChatProps {
   /** The agent's AG-UI route; same origin by default (a proxy in front of the page forwards it). */
@@ -31,9 +68,48 @@ export interface WfoChatProps {
   suggestions?: string[];
   /** Light or dark; by default the popup follows the system. */
   theme?: "auto" | "light" | "dark";
+  /**
+   * The host's own theme, for the mode `theme` names: each colour given wins over the popup's own, in light
+   * and dark alike. A host whose mode can change passes the colours of the current one.
+   */
+  colors?: Partial<WfoChatColors>;
   /** Namespace of the thread in session storage; one popup per key. */
   threadKey?: string;
   defaultOpen?: boolean;
+}
+
+/** Each colour's custom property in the stylesheet, less the `--color-wfo-` it starts with. */
+const TOKENS: Record<keyof WfoChatColors, string> = {
+  bg: "bg",
+  surface: "surface",
+  line: "line",
+  ink: "ink",
+  muted: "muted",
+  accent: "accent",
+  accentStrong: "accent-strong",
+  accentText: "accent-text",
+  accentSoft: "accent-soft",
+  onAccent: "on-accent",
+  mark: "mark",
+  onMark: "on-mark",
+  wait: "wait",
+  waitSoft: "wait-soft",
+  danger: "danger",
+  dangerSoft: "danger-soft",
+};
+
+/**
+ * The colours as the custom properties the stylesheet reads, to set inline on the popup's root: there they
+ * beat the theme's own values, the dark ones included, which the stylesheet sets on that same element.
+ */
+function variablesOf(colors: Partial<WfoChatColors> | undefined): CSSProperties | undefined {
+  if (!colors) return undefined;
+  const style: Record<string, string> = {};
+  for (const [key, token] of Object.entries(TOKENS) as [keyof WfoChatColors, string][]) {
+    const value = colors[key];
+    if (value) style[`--color-wfo-${token}`] = value;
+  }
+  return style as CSSProperties;
 }
 
 const SUGGESTIONS = ["What products are there?", "Show the latest processes", "Create a new service port"];
@@ -58,6 +134,7 @@ export function WfoChat({
   title = "Workflow Orchestrator",
   suggestions = SUGGESTIONS,
   theme = "auto",
+  colors,
   threadKey,
   defaultOpen = false,
 }: WfoChatProps) {
@@ -116,6 +193,7 @@ export function WfoChat({
       <div
         className="wfo-chat contents scheme-light dark:scheme-dark"
         data-theme={theme === "auto" ? undefined : theme}
+        style={variablesOf(colors)}
       >
         {open && (
           <section
