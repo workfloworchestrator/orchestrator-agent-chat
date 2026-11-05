@@ -9,4 +9,7 @@ export const ICON_BUTTON = `${BUTTON} h-8 w-8 shrink-0 rounded-full bg-transpare
 export const CHIP = `${BUTTON} rounded-full border border-solid px-3 py-1 leading-5`;
 export const CHIP_OFF = `${CHIP} border-wfo-line bg-wfo-surface text-wfo-ink hover:border-wfo-accent hover:text-wfo-accent-text`;
 export const CHIP_ON = `${CHIP} border-wfo-accent bg-wfo-accent text-wfo-on-accent`;
+/** The file an export step offers: a chip that is plainly a button, filling in on hover. */
+export const DOWNLOAD = `${CHIP} border-wfo-accent bg-wfo-accent-soft font-medium text-wfo-accent-text hover:bg-wfo-accent hover:text-wfo-on-accent disabled:cursor-default disabled:opacity-70`;
+export const DOWNLOAD_FAILED = `${CHIP} border-wfo-danger bg-wfo-danger-soft font-medium text-wfo-danger`;
 export const FIELD = `box-border w-full rounded-lg border border-solid border-wfo-line bg-wfo-bg px-2.5 py-1.5 font-wfo text-sm text-wfo-ink outline-none placeholder:text-wfo-muted focus:border-wfo-accent`;
