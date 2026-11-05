@@ -22,27 +22,38 @@
 
 /*
  * The popup's look is its theme: bg-wfo-accent, text-wfo-ink, border-wfo-line, font-wfo, ... A host page
- * retunes it by overriding these variables on :root, and gives it its own typeface through --font-wfo.
+ * retunes it by overriding these variables on .wfo-chat-host, or passes `colors` to the component, which sets
+ * them on the popup's root and so wins in the dark too; it gives the popup its own typeface through --font-wfo.
+ *
+ * The values follow the WFO UI, so that the popup looks at home in it: wfoThemeModifications.ts in
+ * orchestrator-ui-library and, where that leaves a colour alone, EUI's Borealis. The name each one comes from
+ * is beside it. wfo-accent fills; wfo-accent-text is for words and icons, which the fill is too light for.
  */
 @theme {
-  --color-wfo-bg: #ffffff;
-  --color-wfo-surface: #f1f4f3;
-  --color-wfo-line: rgb(16 36 44 / 0.12);
-  --color-wfo-ink: #14202b;
-  --color-wfo-muted: #61707c;
-  --color-wfo-accent: #0e6f6b;
-  --color-wfo-accent-strong: #0a5855;
-  --color-wfo-accent-soft: #e1f0ee;
+  --color-wfo-bg: #ffffff; /* backgroundBaseNeutral */
+  --color-wfo-surface: #f4f6fa; /* backgroundBaseSubdued */
+  --color-wfo-line: #ccd5e2; /* borderBasePlain */
+  --color-wfo-ink: #334255; /* textParagraph */
+  --color-wfo-muted: #64758b; /* textSubdued */
+  --color-wfo-accent: #0077c8; /* primary */
+  --color-wfo-accent-strong: #0067ac; /* textPrimary, the hover of a fill */
+  --color-wfo-accent-text: #0067ac; /* textPrimary */
+  --color-wfo-accent-soft: #cce4f4; /* backgroundLightPrimary */
   --color-wfo-on-accent: #ffffff;
-  --color-wfo-mark: #10293a;
-  --color-wfo-on-mark: #7fd6cf;
-  --color-wfo-wait: #9a6307;
-  --color-wfo-wait-soft: #fbf0d9;
-  --color-wfo-danger: #b3261e;
-  --color-wfo-danger-soft: #fdecea;
-  --font-wfo: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --shadow-wfo-panel: 0 24px 48px -12px rgb(10 25 35 / 0.28), 0 1px 3px rgb(10 25 35 / 0.1);
-  --shadow-wfo-launcher: 0 10px 24px -8px rgb(10 25 35 / 0.5);
+  --color-wfo-mark: #04385f; /* header */
+  --color-wfo-on-mark: #ffffff;
+  --color-wfo-wait: #8e6a00; /* textWarning */
+  --color-wfo-wait-soft: #fff6de; /* highlight */
+  --color-wfo-danger: #ac0a01; /* textDanger */
+  --color-wfo-danger-soft: #fff3f1; /* Borealis backgroundBaseDanger */
+  --font-wfo: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --shadow-wfo-panel: 0 24px 48px -12px rgb(0 0 0 / 0.28), 0 1px 3px rgb(0 0 0 / 0.1);
+  --drop-shadow-wfo-launcher: 0 8px 10px rgb(0 0 0 / 0.4);
+
+  /* The WFO UI's corners are 4px: controls, cards and fields here too. */
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
 
   /* Motion answers an event: the panel opening, the agent working, a step arriving, a result landing. */
   --animate-wfo-pop: wfo-pop 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -105,23 +116,20 @@
   }
 }
 
-/* The same theme in the dark. */
+/* The same theme in the dark: what differs from the light, from the theme's DARK side. */
 .wfo-chat {
   @variant dark {
-    --color-wfo-bg: #141c23;
-    --color-wfo-surface: #1d2730;
-    --color-wfo-line: rgb(255 255 255 / 0.11);
-    --color-wfo-ink: #e6ecf0;
-    --color-wfo-muted: #93a1ad;
-    --color-wfo-accent: #3fb7b0;
-    --color-wfo-accent-strong: #5fcdc6;
-    --color-wfo-accent-soft: rgb(63 183 176 / 0.16);
-    --color-wfo-on-accent: #0b1a1e;
-    --color-wfo-mark: #0e6f6b;
-    --color-wfo-on-mark: #e6fbf9;
-    --color-wfo-wait: #e4b04a;
-    --color-wfo-wait-soft: rgb(228 176 74 / 0.16);
-    --color-wfo-danger: #f28b82;
-    --color-wfo-danger-soft: rgb(242 139 130 / 0.16);
+    --color-wfo-bg: #101827; /* backgroundBaseNeutral */
+    --color-wfo-surface: #1f2937; /* backgroundBaseSubdued */
+    --color-wfo-line: #4b5563; /* borderBasePlain */
+    --color-wfo-ink: #ffffff; /* textParagraph */
+    --color-wfo-muted: #9ca3af; /* textSubdued */
+    --color-wfo-accent-strong: #0167ad; /* backgroundFilledPrimary */
+    --color-wfo-accent-text: #1f8dd8; /* textPrimary */
+    --color-wfo-accent-soft: #002a46; /* backgroundLightPrimary */
+    --color-wfo-wait: #ffc514; /* textWarning */
+    --color-wfo-wait-soft: #51482f; /* highlight */
+    --color-wfo-danger: #ff4f46; /* textDanger */
+    --color-wfo-danger-soft: #351721; /* Borealis backgroundBaseDanger */
   }
 }

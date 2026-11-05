@@ -191,9 +191,9 @@ export function StopCard({
   return (
     <div className="self-stretch overflow-hidden rounded-xl border border-wfo-line bg-wfo-bg">
       <div className="flex items-start gap-2 border-b border-wfo-line bg-wfo-accent-soft px-3.5 py-2.5">
-        <FileText size={16} className="mt-0.5 shrink-0 text-wfo-accent" />
+        <FileText size={16} className="mt-0.5 shrink-0 text-wfo-accent-text" />
         <div className="min-w-0">
-          <div className="truncate text-sm leading-5 font-semibold text-wfo-accent">{title}</div>
+          <div className="truncate text-sm leading-5 font-semibold text-wfo-accent-text">{title}</div>
           {workflow && workflow !== title && (
             <div className="truncate text-xs leading-4 text-wfo-muted">Workflow {workflow}</div>
           )}

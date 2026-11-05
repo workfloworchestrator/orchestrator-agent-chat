@@ -37,6 +37,7 @@ agent and allow the origin there.
 | `title`        | The assistant's name in the header (`Workflow Orchestrator`).                                  |
 | `suggestions`  | Opening lines offered in an empty chat; a click sends one.                                     |
 | `theme`        | `auto` follows the system; `light` or `dark` pins it.                                          |
+| `colors`       | The host's own theme, for the mode `theme` names; each colour given wins over the popup's own. |
 | `threadKey`    | Namespace of the current thread in session storage; one popup per key.                         |
 | `historyLimit` | How many of a chat's last messages are loaded when it is opened (50).                          |
 | `defaultOpen`  | Open on load.                                                                                  |
@@ -51,9 +52,18 @@ the pick is the answer. A list question keeps every pick as a chip.
 
 ### Theming
 
-The look is a Tailwind theme (`src/styles/theme.css`): a few colour tokens, a typeface, two shadows and two
-animations. Custom properties are inherited into the shadow root, so a host page retunes the popup by setting
-the variables on the popup's element, `wfo-chat-host`, and gives it its own typeface through `--font-wfo`:
+The look is a Tailwind theme (`src/styles/theme.css`): colour tokens whose values follow the WFO UI in light and
+dark, a typeface, two shadows and a few animations. A host with a theme of its own passes its colours with
+`colors`, naming the mode with `theme`; each colour given wins over the popup's own, in light and dark alike.
+This is how the WFO UI hands the popup EUI's theme, overrides and all:
+
+```tsx
+<WfoChat theme={isDark ? "dark" : "light"} colors={{ accent: colors.primary, accentText: colors.textPrimary }} />
+```
+
+A page without React sets the same as custom properties on the popup's element, `.wfo-chat-host`, which are
+inherited into its shadow root. They reach the light theme; in the dark the popup's own dark values stand.
+`--font-wfo` gives it a typeface either way:
 
 ```css
 .wfo-chat-host {
