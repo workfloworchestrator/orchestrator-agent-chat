@@ -126,7 +126,7 @@ export function Combobox({
                   onMouseEnter={() => setActive(index)}
                   onClick={() => pick(option)}
                   className={`block w-full cursor-pointer appearance-none rounded-md border-0 px-2.5 py-1.5 text-left font-wfo text-sm text-wfo-ink ${
-                    index === active ? "bg-wfo-accent-soft text-wfo-accent" : "bg-transparent"
+                    index === active ? "bg-wfo-accent-soft text-wfo-accent-text" : "bg-transparent"
                   }`}
                 >
                   {option.label}

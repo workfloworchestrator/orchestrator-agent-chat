@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronLeft, Maximize2, Minimize2, Plus, X } from "lucide-react";
+import { ChevronLeft, Maximize2, MessageSquare, Minimize2, Plus, X } from "lucide-react";
 
 import type { AgentContext } from "../api/types";
 import { useWfoAgent } from "../hooks/useWfoAgent";
@@ -243,9 +243,11 @@ export function WfoChat({
             setUnread(false);
           }}
           title={open ? `Close ${title}` : `Open ${title}`}
-          className={`${LAYER} right-4 bottom-4 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full border-0 bg-wfo-mark p-0 text-wfo-on-mark shadow-wfo-launcher hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wfo-accent`}
+          className={`${LAYER} right-4 bottom-4 flex h-14 w-14 cursor-pointer items-center justify-center border-0 bg-transparent p-0 pb-1.5 text-wfo-on-mark drop-shadow-wfo-launcher hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wfo-accent`}
         >
-          {open ? <X size={22} /> : <Mark size={28} />}
+          {/* The button is lucide's speech bubble, filled and stroked in the mark's colour; the logo sits on its body. */}
+          <MessageSquare className="absolute inset-0 h-full w-full fill-wfo-mark stroke-wfo-mark" />
+          <span className="relative inline-flex">{open ? <X size={22} /> : <Mark size={28} />}</span>
           {unread && !open && (
             <span className="absolute top-1 right-1 h-3 w-3 rounded-full bg-wfo-wait ring-2 ring-wfo-bg" />
           )}

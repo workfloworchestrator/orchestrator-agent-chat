@@ -15,7 +15,7 @@ const components: Components = {
   h2: heading,
   h3: heading,
   a: ({ node: _node, ...props }) => (
-    <a className="text-wfo-accent underline underline-offset-2" target="_blank" rel="noreferrer" {...props} />
+    <a className="text-wfo-accent-text underline underline-offset-2" target="_blank" rel="noreferrer" {...props} />
   ),
   hr: ({ node: _node, ...props }) => <hr className="my-2 border-0 border-t border-wfo-line" {...props} />,
   code: ({ node: _node, className, ...props }) => (

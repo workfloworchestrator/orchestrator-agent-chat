@@ -51,7 +51,7 @@ function Step({
           <span
             key={done ? "done" : "waiting"}
             className={`inline-flex h-4 w-4 items-center justify-center rounded-full ${
-              done ? `bg-wfo-accent-soft text-wfo-accent ${land}` : "border border-wfo-line bg-wfo-bg"
+              done ? `bg-wfo-accent-soft text-wfo-accent-text ${land}` : "border border-wfo-line bg-wfo-bg"
             }`}
           >
             {done ? (
@@ -73,7 +73,7 @@ function Step({
                 target="_blank"
                 rel="noreferrer"
                 title="Download"
-                className="inline-flex text-wfo-accent"
+                className="inline-flex text-wfo-accent-text"
               >
                 <Download size={13} />
               </a>

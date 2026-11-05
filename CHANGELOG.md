@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- The theme follows the WFO UI: its colours in light and dark, Inter, and its 4px corners on controls and
+  cards. `--color-wfo-accent-text` is new, for words and icons in the accent.
+- The popup wears the Workflow Orchestrator logo, in its header, its empty chats list and its launcher, and
+  the launcher is a speech bubble.
 - The popup renders in a shadow root and carries its stylesheet: a page's own styles no longer reach it, and
   there is no `style.css` to import. A page retunes it on `.wfo-chat-host` instead of `:root`.
 - Moved out of orchestrator-agent's `demos/web` into this repository; the demo page stays there and
