@@ -1,4 +1,4 @@
-# wfo-chat
+# orchestrator-agent-chat
 
 The Workflow Orchestrator agent as a chat popup in the bottom-right corner of any page. A React component
 that talks to the agent over [AG-UI](https://docs.ag-ui.com): it lists the person's chats, streams the
@@ -8,11 +8,11 @@ workflow's form page by page, with nothing started until the person approves.
 ## Use it
 
 ```bash
-npm install @workfloworchestrator/wfo-chat
+npm install @workfloworchestrator/orchestrator-agent-chat
 ```
 
 ```tsx
-import { WfoChat } from "@workfloworchestrator/wfo-chat";
+import { WfoChat } from "@workfloworchestrator/orchestrator-agent-chat";
 
 <WfoChat agentUrl="/agui/" token={accessToken} context={[{ description: "The subscription on screen", value: id }]} />;
 ```
@@ -90,7 +90,7 @@ checkouts and rebuild on every change:
 
 ```bash
 npm link && npm run build -- --watch                           # here
-cd ../orchestrator-agent/demos/web && npm link @workfloworchestrator/wfo-chat && npm run dev
+cd ../orchestrator-agent/demos/web && npm link @workfloworchestrator/orchestrator-agent-chat && npm run dev
 ```
 
 ### The contract with the agent
