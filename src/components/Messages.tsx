@@ -1,11 +1,13 @@
 import type { Message, ToolCall } from "@ag-ui/core";
-import { useEffect, useRef } from "react";
-import { Check, Download } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Check, FileDown, LoaderCircle } from "lucide-react";
 
+import { HttpError, describe } from "../api/client";
+import type { Artifact } from "../api/types";
 import { artifactOf, textOf } from "../lib/artifacts";
 import { Chart } from "./Chart";
 import { Markdown } from "./Markdown";
-import { CHIP_OFF } from "./classes";
+import { CHIP_OFF, DOWNLOAD, DOWNLOAD_FAILED } from "./classes";
 
 /** The rail's line, drawn by each step: from its top edge to its node, and from its node down to the next step. */
 const LINE_ABOVE =
@@ -26,10 +28,13 @@ function Step({
   fresh,
   first,
   last,
+  onDownload,
 }: {
   call: ToolCall;
   result: string | undefined;
   running: boolean;
+  /** Fetch and save the export an artifact refers to. */
+  onDownload: (artifact: Artifact) => Promise<void>;
   /** Arrived during this run, rather than loaded with the chat. */
   fresh: boolean;
   first: boolean;
@@ -62,24 +67,14 @@ function Step({
           </span>
         </span>
         <span>{name}</span>
-        {artifact && (
+        {artifact && !artifact.download_url && (
           <span
             className={`inline-flex items-center gap-1.5 rounded-full bg-wfo-surface px-2 py-0.5 text-wfo-ink ${land}`}
           >
             {artifact.description ?? artifact.entity_type ?? "result"}
-            {artifact.download_url && (
-              <a
-                href={artifact.download_url}
-                target="_blank"
-                rel="noreferrer"
-                title="Download"
-                className="inline-flex text-wfo-accent-text"
-              >
-                <Download size={13} />
-              </a>
-            )}
           </span>
         )}
+        {artifact?.download_url && <DownloadButton artifact={artifact} onDownload={onDownload} className={land} />}
       </div>
       {chart && (
         <div className={`ml-6 ${fresh ? "motion-safe:animate-wfo-rise" : ""}`}>
@@ -112,16 +107,61 @@ function Typing() {
   );
 }
 
+/**
+ * The export an artifact refers to, as the file it is: a button that downloads it. The agent serves it through
+ * the chat, as the person asking, so it cannot be a plain link. While it is fetched the button turns; a failure
+ * takes the button's place in its words, and a click tries again.
+ */
+function DownloadButton({
+  artifact,
+  onDownload,
+  className = "",
+}: {
+  artifact: Artifact;
+  onDownload: (artifact: Artifact) => Promise<void>;
+  className?: string;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState<string | null>(null);
+  const click = async () => {
+    setBusy(true);
+    setFailed(null);
+    try {
+      await onDownload(artifact);
+    } catch (e) {
+      // The agent says why an export is gone (404); anything else is told as every other failure is.
+      setFailed(e instanceof HttpError && e.status === 404 ? e.message : describe(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <button
+      type="button"
+      title={failed ? "Try again" : "Download the export as a CSV file"}
+      disabled={busy}
+      onClick={() => void click()}
+      className={`${failed ? DOWNLOAD_FAILED : DOWNLOAD} ${className}`}
+    >
+      {busy ? <LoaderCircle size={15} className="animate-spin" /> : <FileDown size={15} />}
+      {failed ?? "Download CSV"}
+    </button>
+  );
+}
+
 export function Messages({
   messages,
   running,
   suggestions,
   onSuggest,
+  onDownload,
 }: {
   messages: Message[];
   running: boolean;
   suggestions: string[];
   onSuggest: (text: string) => void;
+  /** Fetch and save the export a step's artifact refers to. */
+  onDownload: (artifact: Artifact) => Promise<void>;
 }) {
   const bottom = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -204,6 +244,7 @@ export function Messages({
                 fresh={running}
                 first={index === 0}
                 last={index === item.steps.length - 1}
+                onDownload={onDownload}
               />
             ))}
           </ol>

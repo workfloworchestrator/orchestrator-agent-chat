@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- An export downloads: the step's button fetches the chat's export from the agent, as the person asking, and
+  saves the CSV file. The reference used to be a link to core's own path, which no page could follow.
 - `colors` hands the popup a host's own theme, for the mode `theme` names: each colour given wins over the
   popup's own, in light and dark alike. The WFO UI passes EUI's theme through it.
 - The theme follows the WFO UI: its colours in light and dark, Inter, and its 4px corners on controls and

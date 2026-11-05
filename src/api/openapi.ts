@@ -111,6 +111,31 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/chats/{thread_id}/exports/{query_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Download Export
+     * @description An export the chat prepared, as a CSV file: core's rows for the query, fetched as the person asking.
+     *
+     *     The export's ``download_url`` in the chat points here. Core's own export endpoint answers JSON rows,
+     *     behind the person's token, on another origin than the page: this route forwards the token, fetches the
+     *     rows and writes them as the WFO UI writes a CSV. Only an export this chat prepared is served, so a query
+     *     id picked up elsewhere does not open another person's results.
+     */
+    get: operations["download_export_chats__thread_id__exports__query_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/.well-known/agent-card.json": {
     parameters: {
       query?: never;
@@ -475,7 +500,10 @@ export interface components {
       description: string;
       /** Query Id */
       query_id: string;
-      /** Download Url */
+      /**
+       * Download Url
+       * @description Where the export is downloaded. On the AG-UI route it is relative to the chat: ``exports/{query_id}`` under ``GET /chats/{thread_id}/`` serves the rows as a CSV file, as the person asking.
+       */
       download_url: string;
     };
     /**
@@ -921,6 +949,38 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["FieldOption"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  download_export_chats__thread_id__exports__query_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        thread_id: string;
+        query_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
         };
       };
       /** @description Validation Error */

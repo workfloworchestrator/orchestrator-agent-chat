@@ -1,7 +1,7 @@
 import type { Interrupt, Message, ResumeEntry } from "@ag-ui/core";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
-import { chatsUrlOf, describe } from "../api/client";
+import { chatsUrlOf, describe, type ExportFile } from "../api/client";
 import type { AgentContext, ChatSummary, FieldOption } from "../api/types";
 import { uuid } from "../lib/uuid";
 import { useAgentClient } from "./useAgentClient";
@@ -44,6 +44,11 @@ export interface WfoAgentHandle {
   deleteChat: (threadId: string) => Promise<void>;
   /** The options of a searchable question of the pending form stop that the words fit, to pick from. */
   searchOptions: (field: string, words: string) => Promise<FieldOption[]>;
+  /**
+   * An export the agent prepared in this chat, as the CSV file it serves: fetched as the person asking, by the
+   * ``download_url`` the export's reference carries.
+   */
+  downloadExport: (downloadUrl: string) => Promise<ExportFile>;
 }
 
 /**
@@ -109,6 +114,11 @@ export function useWfoAgent({
     [chats, threadId],
   );
 
+  const downloadExport = useCallback(
+    (downloadUrl: string) => chats.exportFile(threadId, downloadUrl),
+    [chats, threadId],
+  );
+
   // The tab's thread, as the agent has it: its messages and the form stop it waits on.
   const openedRef = useRef<string | null>(null);
   useEffect(() => {
@@ -136,5 +146,6 @@ export function useWfoAgent({
     openChat,
     deleteChat,
     searchOptions,
+    downloadExport,
   };
 }
