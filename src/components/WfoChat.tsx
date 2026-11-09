@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { ChevronLeft, Maximize2, MessageSquare, Minimize2, Plus, X } from "lucide-react";
 
-import type { AgentContext } from "../api/types";
+import type { AgentContext, Artifact } from "../api/types";
 import { useWfoAgent } from "../hooks/useWfoAgent";
 import { textOf } from "../lib/artifacts";
+import { saveFile } from "../lib/download";
 import { ChatList } from "./ChatList";
 import { Composer } from "./Composer";
 import { Mark } from "./Mark";
@@ -177,6 +178,14 @@ export function WfoChat({
   }, [open, inChat]);
 
   const send = (text: string) => void chat.send(text);
+  const { downloadExport } = chat;
+  // An export the agent prepared: fetched through the chat, as the person asking, and saved as the file it is.
+  const download = useCallback(
+    async (artifact: Artifact) => {
+      if (artifact.download_url) saveFile(await downloadExport(artifact.download_url));
+    },
+    [downloadExport],
+  );
 
   const chatTitle =
     titleOf(chat.messages) ?? chat.chats.find((c) => c.thread_id === chat.threadId)?.title ?? "New chat";
@@ -258,6 +267,7 @@ export function WfoChat({
                     running={chat.running}
                     suggestions={suggestions}
                     onSuggest={send}
+                    onDownload={download}
                   />
                   {chat.interrupts.map((interrupt) => (
                     <div key={interrupt.id} className="mt-3">

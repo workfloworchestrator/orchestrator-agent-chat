@@ -44,11 +44,15 @@ agent and allow the origin there.
 
 `useWfoAgent` is the hook behind the component, for a host that wants its own chat surface: the thread,
 its interrupts, and `send`, `respond`, `stop`, `newChat`, `listChats`, `openChat`, `deleteChat`,
-`searchOptions`.
+`searchOptions`, `downloadExport`; `saveFile` hands the file `downloadExport` fetched to the browser as a download.
 
 A form question with many options (a customer among hundreds) is searchable: the card shows a search box,
 the words typed fetch the options they fit from the agent (`GET /chats/{thread}/options/{field}?q=`), and
 the pick is the answer. A list question keeps every pick as a chip.
+
+An export the agent prepares (`ExportArtifact`) is downloaded through the agent: its `download_url` is relative to
+the chat, and the step's download button fetches it (`GET /chats/{thread}/exports/{query_id}`) as the person
+asking and saves the CSV file the agent serves. A plain link could not carry the person's token.
 
 ### Theming
 

@@ -143,6 +143,25 @@
         }
       }
     },
+    "/chats/{thread_id}/exports/{query_id}": {
+      "get": {
+        "tags": ["AG-UI"],
+        "summary": "Download Export",
+        "description": "An export the chat prepared, as a CSV file: core's rows for the query, fetched as the person asking.\n\nThe export's ``download_url`` in the chat points here. Core's own export endpoint answers JSON rows,\nbehind the person's token, on another origin than the page: this route forwards the token, fetches the\nrows and writes them as the WFO UI writes a CSV. Only an export this chat prepared is served, so a query\nid picked up elsewhere does not open another person's results.",
+        "operationId": "download_export_chats__thread_id__exports__query_id__get",
+        "parameters": [
+          { "name": "thread_id", "in": "path", "required": true, "schema": { "type": "string", "title": "Thread Id" } },
+          { "name": "query_id", "in": "path", "required": true, "schema": { "type": "string", "title": "Query Id" } }
+        ],
+        "responses": {
+          "200": { "description": "Successful Response", "content": { "application/json": { "schema": {} } } },
+          "422": {
+            "description": "Validation Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } } }
+          }
+        }
+      }
+    },
     "/.well-known/agent-card.json": {
       "get": {
         "tags": ["A2A: Agent Card"],
@@ -438,7 +457,11 @@
         "properties": {
           "description": { "title": "Description", "type": "string" },
           "query_id": { "title": "Query Id", "type": "string" },
-          "download_url": { "title": "Download Url", "type": "string" }
+          "download_url": {
+            "description": "Where the export is downloaded. On the AG-UI route it is relative to the chat: ``exports/{query_id}`` under ``GET /chats/{thread_id}/`` serves the rows as a CSV file, as the person asking.",
+            "title": "Download Url",
+            "type": "string"
+          }
         },
         "required": ["description", "query_id", "download_url"],
         "title": "ExportArtifact",

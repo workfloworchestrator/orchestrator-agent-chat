@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { HttpError, describe, request } from "../api/client";
+import { HttpError, describe, download, exportUrl, request, type ExportFile } from "../api/client";
 import type { ChatDetail, ChatSummary, FieldOption } from "../api/types";
 
 export interface Chats {
@@ -15,6 +15,8 @@ export interface Chats {
   remove: (threadId: string) => Promise<boolean>;
   /** The options of a searchable question of the chat's pending form stop that the words fit. */
   options: (threadId: string, field: string, words: string) => Promise<FieldOption[]>;
+  /** An export the chat prepared, by the ``download_url`` its reference carries: the CSV file the agent serves. */
+  exportFile: (threadId: string, downloadUrl: string) => Promise<ExportFile>;
 }
 
 /** The person's chats as the agent keeps them, through the chats API next to the AG-UI route. */
@@ -91,8 +93,13 @@ export function useChats({
     [get],
   );
 
+  const exportFile = useCallback(
+    (id: string, downloadUrl: string) => download(exportUrl(chatsUrl, id, downloadUrl), headersRef.current ?? {}),
+    [chatsUrl],
+  );
+
   return useMemo(
-    () => ({ chats, loading, error, list, load, remove, options }),
-    [chats, loading, error, list, load, remove, options],
+    () => ({ chats, loading, error, list, load, remove, options, exportFile }),
+    [chats, loading, error, list, load, remove, options, exportFile],
   );
 }
