@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.2
+
 - An export downloads: the step's button fetches the chat's export from the agent, as the person asking, and
   saves the CSV file. The reference used to be a link to core's own path, which no page could follow.
 
