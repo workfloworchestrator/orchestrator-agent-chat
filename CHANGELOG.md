@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.2.1
+
+- No change to the package. The first version published by CI, through npm's trusted publishing.
+
+## 0.2.0
+
+- Renamed the package to `@orchestrator-ui/orchestrator-agent-chat`; the bundle in `dist` is now
+  `orchestrator-agent-chat.js`.
 - `colors` hands the popup a host's own theme, for the mode `theme` names: each colour given wins over the
   popup's own, in light and dark alike. The WFO UI passes EUI's theme through it.
 - The theme follows the WFO UI: its colours in light and dark, Inter, and its 4px corners on controls and

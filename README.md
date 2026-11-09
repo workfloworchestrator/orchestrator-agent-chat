@@ -1,4 +1,4 @@
-# wfo-chat
+# orchestrator-agent-chat
 
 The Workflow Orchestrator agent as a chat popup in the bottom-right corner of any page. A React component
 that talks to the agent over [AG-UI](https://docs.ag-ui.com): it lists the person's chats, streams the
@@ -8,11 +8,11 @@ workflow's form page by page, with nothing started until the person approves.
 ## Use it
 
 ```bash
-npm install @workfloworchestrator/wfo-chat
+npm install @orchestrator-ui/orchestrator-agent-chat
 ```
 
 ```tsx
-import { WfoChat } from "@workfloworchestrator/wfo-chat";
+import { WfoChat } from "@orchestrator-ui/orchestrator-agent-chat";
 
 <WfoChat agentUrl="/agui/" token={accessToken} context={[{ description: "The subscription on screen", value: id }]} />;
 ```
@@ -90,7 +90,7 @@ checkouts and rebuild on every change:
 
 ```bash
 npm link && npm run build -- --watch                           # here
-cd ../orchestrator-agent/demos/web && npm link @workfloworchestrator/wfo-chat && npm run dev
+cd ../orchestrator-agent/demos/web && npm link @orchestrator-ui/orchestrator-agent-chat && npm run dev
 ```
 
 ### The contract with the agent
@@ -128,7 +128,7 @@ publishes nothing. Published versions carry [provenance](https://docs.npmjs.com/
 linking them to the workflow run that built them.
 
 Authentication is npm's [trusted publishing](https://docs.npmjs.com/trusted-publishers), so no token is kept
-in the repository. It is configured once, by an owner of the `@workfloworchestrator` organisation on npm, after
+in the repository. It is configured once, by an owner of the `@orchestrator-ui` organisation on npm, after
 the first version is published by hand from a logged-in checkout (`npm publish`): on the package's page on
 npmjs.com, _Settings_ → _Trusted publisher_ → GitHub Actions, organisation `workfloworchestrator`, repository
 `orchestrator-agent-chat`, workflow `ci.yml`. From then on the `publish` job of that workflow publishes.
