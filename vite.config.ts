@@ -13,7 +13,7 @@ const here = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
-    lib: { entry: here("./src/index.ts"), formats: ["es"], fileName: "wfo-chat" },
+    lib: { entry: here("./src/index.ts"), formats: ["es"], fileName: "orchestrator-agent-chat" },
     rollupOptions: {
       external: [
         /^react($|\/)/,

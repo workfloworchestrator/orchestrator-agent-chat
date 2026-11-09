@@ -1,6 +1,6 @@
 {
-  "name": "@workfloworchestrator/wfo-chat",
-  "version": "0.1.0",
+  "name": "@orchestrator-ui/orchestrator-agent-chat",
+  "version": "0.2.1",
   "description": "The WFO agent as a chat popup for any page: a React component over AG-UI",
   "license": "Apache-2.0",
   "repository": {
@@ -12,13 +12,13 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/wfo-chat.js",
-  "module": "./dist/wfo-chat.js",
+  "main": "./dist/orchestrator-agent-chat.js",
+  "module": "./dist/orchestrator-agent-chat.js",
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
-      "import": "./dist/wfo-chat.js"
+      "import": "./dist/orchestrator-agent-chat.js"
     }
   },
   "publishConfig": {
