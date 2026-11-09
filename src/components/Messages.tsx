@@ -172,8 +172,8 @@ export function Messages({
     return (
       <div className="flex flex-col gap-3 pt-1">
         <p className="m-0 text-sm leading-6 text-wfo-ink">
-          Ask about subscriptions, products and processes, or start a workflow. Its form is filled in here, page by
-          page, and nothing starts until you approve.
+          Ask about subscriptions, products and processes, or start a workflow: say what you need and the assistant asks
+          for the rest. Nothing starts until you approve.
         </p>
         {suggestions.length > 0 && (
           <div className="flex flex-wrap gap-1.5">

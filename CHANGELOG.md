@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Workflow forms are conversational: the agent fills a form's pages in the chat and the popup shows one card,
+  the start to approve. The question card with its chips, text boxes and searchable select is gone, and so are
+  `searchOptions` on `useWfoAgent` and the `GET /chats/{thread}/options/{field}` call. A message typed while
+  the approval is open rejects the start with those words, for the agent to act on, where it used to cancel
+  the form. Needs an agent with the hybrid form-fill (orchestrator-agent `feat/hybrid-form-fill`).
+
 ## 0.2.2
 
 - An export downloads: the step's button fetches the chat's export from the agent, as the person asking, and

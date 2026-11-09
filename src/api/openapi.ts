@@ -88,29 +88,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/chats/{thread_id}/options/{field}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Search Options
-     * @description The options of a searchable question of the chat's pending form stop that ``q`` fits.
-     *
-     *     For a client that lets the person search a long list instead of typing a name blind: the pick is
-     *     answered with the option's value. The options come from the field's widget, as the person asking.
-     */
-    get: operations["search_options_chats__thread_id__options__field__get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/chats/{thread_id}/exports/{query_id}": {
     parameters: {
       query?: never;
@@ -320,16 +297,6 @@ export interface components {
       /** Text */
       text?: string | null;
     };
-    /**
-     * FieldOption
-     * @description One option of a searchable question: the value to answer with, and how the person sees it.
-     */
-    FieldOption: {
-      /** Value */
-      value: string | number;
-      /** Label */
-      label: string;
-    };
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -351,6 +318,8 @@ export interface components {
     /**
      * ApprovalAnswer
      * @description The payload that resolves a ``tool_call`` interrupt: the decision on the start, as AG-UI shapes an approval.
+     *
+     *     A rejection may say why, or what to change: the form reopens and the model acts on it.
      */
     ApprovalAnswer: {
       /** Approved */
@@ -373,80 +342,6 @@ export interface components {
       form: {
         [key: string]: unknown;
       } | null;
-    };
-    /**
-     * AskAnswers
-     * @description The payload that resolves an ``ask_user`` interrupt: one answer per question, in the order asked.
-     *
-     *     An answer is the positions of the choices picked (several only for a question that takes several), or
-     *     the text typed; an empty answer leaves the field to its default.
-     */
-    AskAnswers: {
-      /** Answers */
-      answers: (number | string)[][];
-    };
-    /**
-     * AskStop
-     * @description The metadata of an ``ask_user`` interrupt: the page's questions and the form they belong to.
-     */
-    AskStop: {
-      /** Workflow Key */
-      workflow_key: string;
-      /** Title */
-      title: string;
-      /** Questions */
-      questions: components["schemas"]["AskedQuestion"][];
-      /** Form */
-      form: {
-        [key: string]: unknown;
-      } | null;
-    };
-    /**
-     * AskedQuestion
-     * @description A question as the interrupt shows it: an ``AskField`` without the values behind its choices.
-     *
-     *     An answer picks a choice by position, so the client never sees the form values.
-     */
-    AskedQuestion: {
-      /** Name */
-      name: string;
-      /** Question */
-      question: string;
-      /**
-       * Choices
-       * @default []
-       */
-      choices?: string[];
-      /**
-       * Multiple
-       * @default false
-       */
-      multiple?: boolean;
-      /**
-       * Required
-       * @default true
-       */
-      required?: boolean;
-      /**
-       * Title
-       * @default
-       */
-      title?: string;
-      /**
-       * Problem
-       * @default
-       */
-      problem?: string;
-      /**
-       * Hint
-       * @default
-       */
-      hint?: string;
-      /**
-       * Searchable
-       * @default false
-       */
-      searchable?: boolean;
     };
     /**
      * ChartData
@@ -915,41 +810,6 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  search_options_chats__thread_id__options__field__get: {
-    parameters: {
-      query?: {
-        q?: string;
-        limit?: number;
-      };
-      header?: never;
-      path: {
-        thread_id: string;
-        field: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["FieldOption"][];
-        };
       };
       /** @description Validation Error */
       422: {

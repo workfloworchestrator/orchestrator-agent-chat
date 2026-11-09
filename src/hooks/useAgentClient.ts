@@ -3,14 +3,14 @@ import type { ResumeEntry } from "@ag-ui/core";
 import { type Dispatch, type RefObject, useCallback, useEffect, useMemo, useRef } from "react";
 
 import { aborted, describe } from "../api/client";
-import type { AgentContext } from "../api/types";
+import type { AgentContext, ApprovalAnswer } from "../api/types";
 import { uuid } from "../lib/uuid";
 import type { ThreadAction } from "./useThreadState";
 
 export interface AgentClient {
-  /** Send a message on the thread; a message while a form waits ends the form first. */
+  /** Send a message on the thread; while a start waits for approval, the message says what to change. */
   send: (text: string) => Promise<void>;
-  /** Answer the pending interrupts: the next run carries the entries, and the agent continues the form. */
+  /** Answer the pending interrupts: the next run carries the entries, and the agent acts on the decision. */
   respond: (entries: ResumeEntry[]) => Promise<void>;
   /** End the reply in progress. */
   stop: () => void;
@@ -99,18 +99,17 @@ export function useAgentClient({
       const agent = agentRef.current;
       const content = text.trim();
       if (!agent || !content || runningRef.current) return;
-      // A message instead of an answer ends the form, as on every transport. The client will not start a
-      // run that leaves an interrupt unaddressed, so the form is cancelled first, then the message is sent.
-      if (agent.pendingInterrupts.length) {
-        await run(
-          agent,
-          agent.pendingInterrupts.map((pending) => ({ interruptId: pending.id, status: "cancelled" as const })),
-        );
-        if (agent.pendingInterrupts.length) return; // the cancel did not go through: the card stays
-      }
+      // A message while a start waits for approval is the person saying what to change: the start is
+      // rejected with their words, and the agent acts on them. The client will not start a run that leaves
+      // an interrupt unaddressed, so the rejection travels with the message, in the same run.
+      const rejected: ResumeEntry[] = agent.pendingInterrupts.map((pending) => ({
+        interruptId: pending.id,
+        status: "resolved",
+        payload: { approved: false, reason: content } satisfies ApprovalAnswer,
+      }));
       agent.setMessages([{ id: uuid(), role: "user", content }]);
       dispatch({ type: "run_streamed", messages: [...agent.messages] });
-      await run(agent);
+      await run(agent, rejected.length ? rejected : undefined);
     },
     [dispatch, run],
   );

@@ -2,8 +2,9 @@
 
 The Workflow Orchestrator agent as a chat popup in the bottom-right corner of any page. A React component
 that talks to the agent over [AG-UI](https://docs.ag-ui.com): it lists the person's chats, streams the
-agent's replies with the steps it takes, draws the charts the agent attaches to a result, and walks a
-workflow's form page by page, with nothing started until the person approves.
+agent's replies with the steps it takes, draws the charts the agent attaches to a result, and shows a
+workflow's start for approval once the agent has filled its form in the conversation: nothing starts until
+the person approves.
 
 ## Use it
 
@@ -44,11 +45,13 @@ agent and allow the origin there.
 
 `useWfoAgent` is the hook behind the component, for a host that wants its own chat surface: the thread,
 its interrupts, and `send`, `respond`, `stop`, `newChat`, `listChats`, `openChat`, `deleteChat`,
-`searchOptions`, `downloadExport`; `saveFile` hands the file `downloadExport` fetched to the browser as a download.
+`downloadExport`; `saveFile` hands the file `downloadExport` fetched to the browser as a download.
 
-A form question with many options (a customer among hundreds) is searchable: the card shows a search box,
-the words typed fetch the options they fit from the agent (`GET /chats/{thread}/options/{field}?q=`), and
-the pick is the answer. A list question keeps every pick as a chip.
+A workflow's form has no components of its own here. The agent fills it in the conversation: it reads what
+the person says, looks options up itself and asks in plain words for what is missing. The one card is the
+start to approve (an AG-UI interrupt, `ApprovalCard`), with the values as they will be sent above it: Approve
+starts the workflow, Reject cancels the form, and a message typed while the card is open rejects the start
+with those words, so "make it 1G" is a correction the agent acts on before it offers the start again.
 
 An export the agent prepares (`ExportArtifact`) is downloaded through the agent: its `download_url` is relative to
 the chat, and the step's download button fetches it (`GET /chats/{thread}/exports/{query_id}`) as the person
@@ -101,7 +104,7 @@ cd ../orchestrator-agent/demos/web && npm link @orchestrator-ui/orchestrator-age
 
 `src/api/openapi.ts` is generated from the agent's OpenAPI document, never edited. The agent is FastAPI, and
 its document also names what travels inside AG-UI messages (a tool result's artifact reference with its chart
-data, the metadata and answers of a form stop), so everything the popup reads from the agent beyond AG-UI
+data, the metadata of a workflow's approval and the answer to it), so everything the popup reads from the agent beyond AG-UI
 itself comes from `/openapi.json`. `src/api/types.ts` picks the schemas the popup uses out of it and adds
 the AG-UI pieces (`Message`, `Interrupt`, `Context`).
 
