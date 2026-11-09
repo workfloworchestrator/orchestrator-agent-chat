@@ -5,12 +5,12 @@ import type { AgentContext, Artifact } from "../api/types";
 import { useWfoAgent } from "../hooks/useWfoAgent";
 import { textOf } from "../lib/artifacts";
 import { saveFile } from "../lib/download";
+import { ApprovalCard } from "./ApprovalCard";
 import { ChatList } from "./ChatList";
 import { Composer } from "./Composer";
 import { Mark } from "./Mark";
 import { Messages } from "./Messages";
 import { Shadow } from "./Shadow";
-import { StopCard } from "./StopCard";
 import { ICON_BUTTON, PRIMARY } from "./classes";
 
 /**
@@ -271,14 +271,12 @@ export function WfoChat({
                   />
                   {chat.interrupts.map((interrupt) => (
                     <div key={interrupt.id} className="mt-3">
-                      <StopCard
+                      <ApprovalCard
                         interrupt={interrupt}
                         busy={chat.running}
-                        search={chat.searchOptions}
                         onResolve={(payload) =>
                           void chat.respond([{ interruptId: interrupt.id, status: "resolved", payload }])
                         }
-                        onCancel={() => void chat.respond([{ interruptId: interrupt.id, status: "cancelled" }])}
                       />
                     </div>
                   ))}
@@ -305,9 +303,7 @@ export function WfoChat({
                 <Composer
                   inputRef={input}
                   placeholder={
-                    chat.interrupts.length
-                      ? "Answer above, or type to leave the form"
-                      : "Ask the Workflow Orchestrator…"
+                    chat.interrupts.length ? "Approve above, or say what to change" : "Ask the Workflow Orchestrator…"
                   }
                   running={chat.running}
                   onSend={send}

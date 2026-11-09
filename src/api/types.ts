@@ -19,22 +19,16 @@ export type ExportArtifact = Schemas["ExportArtifact"];
 export type RenderedBlock = Schemas["RenderedBlock"];
 export type ChartData = Schemas["ChartData"];
 export type ChartPoint = Schemas["ChartPoint"];
-/** What an ``ask_user`` interrupt carries in its metadata: a form page's questions. */
-export type AskStop = Schemas["AskStop"];
-export type AskedQuestion = Schemas["AskedQuestion"];
 /** What a ``tool_call`` interrupt carries in its metadata: the workflow start to approve. */
 export type ApprovalStop = Schemas["ApprovalStop"];
 export type ToolCall = Schemas["ToolCall"];
-/** The payloads that resolve the two stops. */
-export type AskAnswers = Schemas["AskAnswers"];
+/** The payload that resolves it: the decision, and what the person said when they did not approve. */
 export type ApprovalAnswer = Schemas["ApprovalAnswer"];
-/** One option of a searchable question (``GET /chats/{thread}/options/{field}``); its value is the answer. */
-export type FieldOption = Schemas["FieldOption"];
 
 /** One thing the host page knows that the agent should too, as AG-UI carries it (``RunAgentInput.context``). */
 export type AgentContext = Context;
 
-/** A chat as the agent gives it back (``GET /chats/{id}``): its last messages and the form stop it waits on. */
+/** A chat as the agent gives it back (``GET /chats/{id}``): its last messages and the approval it waits on. */
 export interface ChatDetail extends ChatSummary {
   messages: Message[];
   pending: Interrupt | null;

@@ -101,48 +101,6 @@
         }
       }
     },
-    "/chats/{thread_id}/options/{field}": {
-      "get": {
-        "tags": ["AG-UI"],
-        "summary": "Search Options",
-        "description": "The options of a searchable question of the chat's pending form stop that ``q`` fits.\n\nFor a client that lets the person search a long list instead of typing a name blind: the pick is\nanswered with the option's value. The options come from the field's widget, as the person asking.",
-        "operationId": "search_options_chats__thread_id__options__field__get",
-        "parameters": [
-          { "name": "thread_id", "in": "path", "required": true, "schema": { "type": "string", "title": "Thread Id" } },
-          { "name": "field", "in": "path", "required": true, "schema": { "type": "string", "title": "Field" } },
-          {
-            "name": "q",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "string", "maxLength": 200, "default": "", "title": "Q" }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "integer", "maximum": 50, "minimum": 1, "default": 20, "title": "Limit" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/FieldOption" },
-                  "title": "Response Search Options Chats  Thread Id  Options  Field  Get"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } } }
-          }
-        }
-      }
-    },
     "/chats/{thread_id}/exports/{query_id}": {
       "get": {
         "tags": ["AG-UI"],
@@ -319,16 +277,6 @@
         "title": "ContentPart",
         "description": "One part of a message's content; only its text is read."
       },
-      "FieldOption": {
-        "properties": {
-          "value": { "anyOf": [{ "type": "string" }, { "type": "integer" }], "title": "Value" },
-          "label": { "type": "string", "title": "Label" }
-        },
-        "type": "object",
-        "required": ["value", "label"],
-        "title": "FieldOption",
-        "description": "One option of a searchable question: the value to answer with, and how the person sees it."
-      },
       "HTTPValidationError": {
         "properties": {
           "detail": { "items": { "$ref": "#/components/schemas/ValidationError" }, "type": "array", "title": "Detail" }
@@ -353,7 +301,7 @@
         "title": "ValidationError"
       },
       "ApprovalAnswer": {
-        "description": "The payload that resolves a ``tool_call`` interrupt: the decision on the start, as AG-UI shapes an approval.",
+        "description": "The payload that resolves a ``tool_call`` interrupt: the decision on the start, as AG-UI shapes an approval.\n\nA rejection may say why, or what to change: the form reopens and the model acts on it.",
         "properties": {
           "approved": { "title": "Approved", "type": "boolean" },
           "reason": { "anyOf": [{ "type": "string" }, { "type": "null" }], "default": null, "title": "Reason" }
@@ -371,52 +319,6 @@
         },
         "required": ["workflow_key", "tool", "form"],
         "title": "ApprovalStop",
-        "type": "object"
-      },
-      "AskAnswers": {
-        "description": "The payload that resolves an ``ask_user`` interrupt: one answer per question, in the order asked.\n\nAn answer is the positions of the choices picked (several only for a question that takes several), or\nthe text typed; an empty answer leaves the field to its default.",
-        "properties": {
-          "answers": {
-            "items": { "items": { "anyOf": [{ "type": "integer" }, { "type": "string" }] }, "type": "array" },
-            "title": "Answers",
-            "type": "array"
-          }
-        },
-        "required": ["answers"],
-        "title": "AskAnswers",
-        "type": "object"
-      },
-      "AskStop": {
-        "description": "The metadata of an ``ask_user`` interrupt: the page's questions and the form they belong to.",
-        "properties": {
-          "workflow_key": { "title": "Workflow Key", "type": "string" },
-          "title": { "title": "Title", "type": "string" },
-          "questions": {
-            "items": { "$ref": "#/components/schemas/AskedQuestion" },
-            "title": "Questions",
-            "type": "array"
-          },
-          "form": { "anyOf": [{ "additionalProperties": true, "type": "object" }, { "type": "null" }], "title": "Form" }
-        },
-        "required": ["workflow_key", "title", "questions", "form"],
-        "title": "AskStop",
-        "type": "object"
-      },
-      "AskedQuestion": {
-        "description": "A question as the interrupt shows it: an ``AskField`` without the values behind its choices.\n\nAn answer picks a choice by position, so the client never sees the form values.",
-        "properties": {
-          "name": { "title": "Name", "type": "string" },
-          "question": { "title": "Question", "type": "string" },
-          "choices": { "default": [], "items": { "type": "string" }, "title": "Choices", "type": "array" },
-          "multiple": { "default": false, "title": "Multiple", "type": "boolean" },
-          "required": { "default": true, "title": "Required", "type": "boolean" },
-          "title": { "default": "", "title": "Title", "type": "string" },
-          "problem": { "default": "", "title": "Problem", "type": "string" },
-          "hint": { "default": "", "title": "Hint", "type": "string" },
-          "searchable": { "default": false, "title": "Searchable", "type": "boolean" }
-        },
-        "required": ["name", "question"],
-        "title": "AskedQuestion",
         "type": "object"
       },
       "ChartData": {
