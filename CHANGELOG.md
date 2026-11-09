@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.2.1
+
+- No change to the package. The first version published by CI, through npm's trusted publishing.
+
 ## 0.2.0
 
 - Renamed the package to `@orchestrator-ui/orchestrator-agent-chat`; the bundle in `dist` is now
