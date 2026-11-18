@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { HttpError, describe, download, exportUrl, request, type ExportFile } from "../api/client";
-import type { ChatDetail, ChatSummary, FieldOption } from "../api/types";
+import type { ChatDetail, ChatSummary } from "../api/types";
 
 export interface Chats {
   chats: ChatSummary[];
@@ -9,12 +9,10 @@ export interface Chats {
   loading: boolean;
   error: string | null;
   list: () => Promise<void>;
-  /** A chat with its last messages and the form stop it waits on; null for a thread the agent has not seen. */
+  /** A chat with its last messages and the approval it waits on; null for a thread the agent has not seen. */
   load: (threadId: string) => Promise<ChatDetail | null>;
   /** Forget a chat; whether the agent did. */
   remove: (threadId: string) => Promise<boolean>;
-  /** The options of a searchable question of the chat's pending form stop that the words fit. */
-  options: (threadId: string, field: string, words: string) => Promise<FieldOption[]>;
   /** An export the chat prepared, by the ``download_url`` its reference carries: the CSV file the agent serves. */
   exportFile: (threadId: string, downloadUrl: string) => Promise<ExportFile>;
 }
@@ -83,23 +81,13 @@ export function useChats({
     [get],
   );
 
-  const options = useCallback(
-    async (id: string, field: string, words: string) => {
-      const query = new URLSearchParams({ q: words, limit: "20" });
-      return (
-        (await get<FieldOption[]>(`/${encodeURIComponent(id)}/options/${encodeURIComponent(field)}?${query}`)) ?? []
-      );
-    },
-    [get],
-  );
-
   const exportFile = useCallback(
     (id: string, downloadUrl: string) => download(exportUrl(chatsUrl, id, downloadUrl), headersRef.current ?? {}),
     [chatsUrl],
   );
 
   return useMemo(
-    () => ({ chats, loading, error, list, load, remove, options, exportFile }),
-    [chats, loading, error, list, load, remove, options, exportFile],
+    () => ({ chats, loading, error, list, load, remove, exportFile }),
+    [chats, loading, error, list, load, remove, exportFile],
   );
 }

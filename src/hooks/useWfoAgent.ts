@@ -2,7 +2,7 @@ import type { Interrupt, Message, ResumeEntry } from "@ag-ui/core";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { chatsUrlOf, describe, type ExportFile } from "../api/client";
-import type { AgentContext, ChatSummary, FieldOption } from "../api/types";
+import type { AgentContext, ChatSummary } from "../api/types";
 import { uuid } from "../lib/uuid";
 import { useAgentClient } from "./useAgentClient";
 import { useChats } from "./useChats";
@@ -27,7 +27,7 @@ export interface WfoAgentHandle {
   threadId: string;
   /** The thread: what the agent stored, plus this run's messages as they stream. */
   messages: Message[];
-  /** The stops the last run ended on (a form page's questions, the start to approve), waiting for a response. */
+  /** The stops the last run ended on (a workflow's start to approve), waiting for the person's decision. */
   interrupts: Interrupt[];
   running: boolean;
   /** A chat is being opened or the list fetched. */
@@ -35,15 +35,13 @@ export interface WfoAgentHandle {
   error: string | null;
   chats: ChatSummary[];
   send: (text: string) => Promise<void>;
-  /** Answer the pending interrupts: the next run carries the entries, and the agent continues the form. */
+  /** Answer the pending interrupts: the next run carries the entries, and the agent acts on the decision. */
   respond: (entries: ResumeEntry[]) => Promise<void>;
   stop: () => void;
   newChat: () => void;
   listChats: () => Promise<void>;
   openChat: (threadId: string) => Promise<void>;
   deleteChat: (threadId: string) => Promise<void>;
-  /** The options of a searchable question of the pending form stop that the words fit, to pick from. */
-  searchOptions: (field: string, words: string) => Promise<FieldOption[]>;
   /**
    * An export the agent prepared in this chat, as the CSV file it serves: fetched as the person asking, by the
    * ``download_url`` the export's reference carries.
@@ -109,17 +107,12 @@ export function useWfoAgent({
     [chats, newChat, threadId],
   );
 
-  const searchOptions = useCallback(
-    (field: string, words: string) => chats.options(threadId, field, words),
-    [chats, threadId],
-  );
-
   const downloadExport = useCallback(
     (downloadUrl: string) => chats.exportFile(threadId, downloadUrl),
     [chats, threadId],
   );
 
-  // The tab's thread, as the agent has it: its messages and the form stop it waits on.
+  // The tab's thread, as the agent has it: its messages and the approval it waits on.
   const openedRef = useRef<string | null>(null);
   useEffect(() => {
     if (openedRef.current === threadId) return;
@@ -145,7 +138,6 @@ export function useWfoAgent({
     listChats: chats.list,
     openChat,
     deleteChat,
-    searchOptions,
     downloadExport,
   };
 }

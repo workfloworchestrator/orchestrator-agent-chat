@@ -9,12 +9,15 @@ const MAX_HEIGHT = 120;
 export function Composer({
   placeholder,
   running,
+  disabled = false,
   onSend,
   onStop,
   inputRef,
 }: {
   placeholder: string;
   running: boolean;
+  /** Nothing can be sent now: a decision is waiting above. */
+  disabled?: boolean;
   onSend: (text: string) => void;
   /** Ends the reply in progress. */
   onStop: () => void;
@@ -52,7 +55,8 @@ export function Composer({
         onChange={onChange}
         onKeyDown={onKey}
         placeholder={placeholder}
-        className="m-0 box-border w-full flex-1 resize-none border-0 bg-transparent p-0 py-1.5 font-wfo text-sm leading-5 text-wfo-ink outline-none placeholder:text-wfo-muted"
+        disabled={disabled}
+        className="m-0 box-border w-full flex-1 resize-none border-0 bg-transparent p-0 py-1.5 font-wfo text-sm leading-5 text-wfo-ink outline-none placeholder:text-wfo-muted disabled:cursor-not-allowed"
         style={{ maxHeight: MAX_HEIGHT }}
       />
       {running ? (
@@ -68,7 +72,7 @@ export function Composer({
         <button
           type="button"
           onClick={send}
-          disabled={!draft.trim()}
+          disabled={disabled || !draft.trim()}
           title="Send"
           className={`${ICON_BUTTON} bg-wfo-accent text-wfo-on-accent hover:bg-wfo-accent-strong hover:text-wfo-on-accent disabled:bg-wfo-line disabled:text-wfo-muted disabled:opacity-100`}
         >
