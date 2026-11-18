@@ -1,13 +1,14 @@
 import type { Message, ToolCall } from "@ag-ui/core";
 import { useEffect, useRef, useState } from "react";
-import { Check, FileDown, LoaderCircle } from "lucide-react";
+import { Check, ChevronRight, FileDown, LoaderCircle } from "lucide-react";
 
 import { HttpError, describe } from "../api/client";
-import type { Artifact } from "../api/types";
+import { FORM_ACTIVITY, type Artifact, type FormActivity } from "../api/types";
 import { artifactOf, textOf } from "../lib/artifacts";
 import { Chart } from "./Chart";
+import { FormProgress } from "./FormProgress";
 import { Markdown } from "./Markdown";
-import { CHIP_OFF, DOWNLOAD, DOWNLOAD_FAILED } from "./classes";
+import { CHIP_OFF, DISCLOSE, DOWNLOAD, DOWNLOAD_FAILED } from "./classes";
 
 /** The rail's line, drawn by each step: from its top edge to its node, and from its node down to the next step. */
 const LINE_ABOVE =
@@ -15,8 +16,30 @@ const LINE_ABOVE =
 const LINE_BELOW =
   "after:absolute after:top-2.5 after:bottom-0 after:left-[7.5px] after:w-px after:origin-top after:bg-wfo-line";
 
+/** JSON as a person reads it, indented; anything that is not JSON as it came. */
+function pretty(text: string): string {
+  try {
+    return JSON.stringify(JSON.parse(text), null, 2);
+  } catch {
+    return text;
+  }
+}
+
+/** What went into a tool call or came out of it, as it is: raw, under a small heading. */
+function Raw({ label, text }: { label: string; text: string }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <div className="text-xs leading-4 text-wfo-muted">{label}</div>
+      <pre className="m-0 max-h-48 overflow-auto rounded-lg border border-solid border-wfo-line bg-wfo-surface px-2.5 py-1.5 font-mono text-xs leading-4 whitespace-pre-wrap text-wfo-ink">
+        {pretty(text)}
+      </pre>
+    </div>
+  );
+}
+
 /**
- * One step the agent took, a node on the rail: the tool it called, and what came back.
+ * One step the agent took, a node on the rail: the tool it called, and what came back. Its name opens the
+ * call as it was made: the parameters that went in and the result that came out, as JSON.
  *
  * A step that arrives while the agent works is seen arriving: the line draws down to it, its row comes in
  * behind, and the check and the result's chip land when the result does. A stored chat's steps just are.
@@ -40,6 +63,7 @@ function Step({
   first: boolean;
   last: boolean;
 }) {
+  const [open, setOpen] = useState(false);
   const artifact = artifactOf(result);
   const name = call.function.name.replaceAll("_", " ");
   const done = result !== undefined;
@@ -66,7 +90,10 @@ function Step({
             ) : null}
           </span>
         </span>
-        <span>{name}</span>
+        <button type="button" aria-expanded={open} className={DISCLOSE} onClick={() => setOpen((was) => !was)}>
+          {name}
+          <ChevronRight size={12} className={`transition-transform ${open ? "rotate-90" : ""}`} />
+        </button>
         {artifact && !artifact.download_url && (
           <span
             className={`inline-flex items-center gap-1.5 rounded-full bg-wfo-surface px-2 py-0.5 text-wfo-ink ${land}`}
@@ -76,6 +103,12 @@ function Step({
         )}
         {artifact?.download_url && <DownloadButton artifact={artifact} onDownload={onDownload} className={land} />}
       </div>
+      {open && (
+        <div className="ml-6 flex flex-col gap-1.5">
+          <Raw label="Parameters" text={call.function.arguments || "{}"} />
+          {result !== undefined && <Raw label="Result" text={result} />}
+        </div>
+      )}
       {chart && (
         <div className={`ml-6 ${fresh ? "motion-safe:animate-wfo-rise" : ""}`}>
           <Chart chart={chart} />
@@ -92,10 +125,13 @@ function Step({
   );
 }
 
+type StepOf = { call: ToolCall; result: string | undefined };
+
 type Item =
   | { kind: "user"; id: string; text: string }
   | { kind: "text"; id: string; text: string }
-  | { kind: "steps"; id: string; steps: { call: ToolCall; result: string | undefined }[] };
+  | { kind: "steps"; id: string; steps: StepOf[] }
+  | { kind: "form"; id: string; form: FormActivity; steps: StepOf[] };
 
 function Typing() {
   return (
@@ -194,8 +230,18 @@ export function Messages({
   const last = messages[messages.length - 1];
   const thinking = running && (last.role !== "assistant" || !textOf(last.content));
 
+  // A workflow form is one activity message, which the agent replaces as the form moves on: the last one
+  // says where the form stands and which steps are its own.
+  const forms = new Map<string, FormActivity>();
+  for (const m of messages) {
+    if (m.role === "activity" && m.activityType === FORM_ACTIVITY) forms.set(m.id, m.content as FormActivity);
+  }
+  const formOf = new Map<string, string>();
+  for (const [id, form] of forms) for (const call of form.calls ?? []) formOf.set(call, id);
+
   // What is shown, in order: the person's messages, the agent's words, and its steps — consecutive steps
-  // joined on one rail even when the model took them in separate turns.
+  // joined on one rail even when the model took them in separate turns. A form's steps are shown in its
+  // card, which stands where the form last moved.
   const items: Item[] = [];
   for (const m of messages) {
     if (m.role === "user") {
@@ -204,14 +250,37 @@ export function Messages({
       const text = textOf(m.content);
       if (text) items.push({ kind: "text", id: m.id, text });
       for (const call of m.toolCalls ?? []) {
-        const previous = items[items.length - 1];
         const step = { call, result: results.get(call.id) };
+        const id = formOf.get(call.id);
+        if (id !== undefined) {
+          const at = items.findIndex((item) => item.kind === "form" && item.id === id);
+          const earlier = at >= 0 ? (items.splice(at, 1)[0] as Extract<Item, { kind: "form" }>).steps : [];
+          items.push({ kind: "form", id, form: forms.get(id)!, steps: [...earlier, step] });
+          continue;
+        }
+        const previous = items[items.length - 1];
         if (previous?.kind === "steps") previous.steps.push(step);
         else items.push({ kind: "steps", id: call.id, steps: [step] });
       }
     }
     // tool results are shown under their call; system and other roles are not shown
   }
+  const rail = (steps: StepOf[]) => (
+    <ol className="m-0 flex max-w-full list-none flex-col self-start p-0">
+      {steps.map(({ call, result }, index) => (
+        <Step
+          key={call.id}
+          call={call}
+          result={result}
+          running={running}
+          fresh={running}
+          first={index === 0}
+          last={index === steps.length - 1}
+          onDownload={onDownload}
+        />
+      ))}
+    </ol>
+  );
 
   return (
     <div className="flex flex-col gap-3">
@@ -226,6 +295,18 @@ export function Messages({
             </div>
           );
         }
+        if (item.kind === "form") {
+          return (
+            <FormProgress
+              key={item.id}
+              form={item.form}
+              steps={item.steps.length}
+              working={running && item.form.phase !== "done" && item === items[items.length - 1]}
+            >
+              {rail(item.steps)}
+            </FormProgress>
+          );
+        }
         if (item.kind === "text") {
           return (
             <div key={item.id} className="max-w-full self-start text-sm text-wfo-ink">
@@ -233,22 +314,7 @@ export function Messages({
             </div>
           );
         }
-        return (
-          <ol key={item.id} className="m-0 flex max-w-full list-none flex-col self-start p-0">
-            {item.steps.map(({ call, result }, index) => (
-              <Step
-                key={call.id}
-                call={call}
-                result={result}
-                running={running}
-                fresh={running}
-                first={index === 0}
-                last={index === item.steps.length - 1}
-                onDownload={onDownload}
-              />
-            ))}
-          </ol>
-        );
+        return <div key={item.id}>{rail(item.steps)}</div>;
       })}
       {thinking && <Typing />}
       <div ref={bottom} />

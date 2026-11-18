@@ -97,103 +97,14 @@ export interface paths {
     };
     /**
      * Download Export
-     * @description An export the chat prepared, as a CSV file: core's rows for the query, fetched as the person asking.
+     * @description An export the chat prepared: core's CSV file for the query, fetched as the person asking and passed on.
      *
-     *     The export's ``download_url`` in the chat points here. Core's own export endpoint answers JSON rows,
-     *     behind the person's token, on another origin than the page: this route forwards the token, fetches the
-     *     rows and writes them as the WFO UI writes a CSV. Only an export this chat prepared is served, so a query
-     *     id picked up elsewhere does not open another person's results.
+     *     The export's ``download_url`` in the chat points here. Core's own export endpoint is behind the person's
+     *     token, on another origin than the page: this route forwards the token and hands core's answer on as it
+     *     came, the file with its content type and name. Only an export this chat prepared is served, so a query id
+     *     picked up elsewhere does not open another person's results.
      */
     get: operations["download_export_chats__thread_id__exports__query_id__get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/.well-known/agent-card.json": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Agent Card
-     * @description Returns the public AgentCard describing this agent's capabilities, supported transports, and skills.
-     */
-    get: operations["_get_agent_card__well_known_agent_card_json_get"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * A2A JSON-RPC endpoint
-     * @description A2A JSON-RPC 2.0 endpoint. The `method` field selects the operation;
-     *     `params` must match that method's schema (see the `oneOf` below).
-     *
-     *     **Supported methods:**
-     *
-     *     - `SendMessage` — Send a message to the agent (returns a Task or response Message).
-     *     - `SendStreamingMessage` — Send a message and receive a Server-Sent Events stream.
-     *     - `GetTask` — Fetch a task by ID.
-     *     - `ListTasks` — List tasks with pagination and filtering.
-     *     - `CancelTask` — Cancel an in-progress task.
-     *     - `CreateTaskPushNotificationConfig` — Register a push-notification config on a task.
-     *     - `GetTaskPushNotificationConfig` — Read a single push-notification config.
-     *     - `ListTaskPushNotificationConfigs` — List all push-notification configs for a task.
-     *     - `DeleteTaskPushNotificationConfig` — Delete a push-notification config.
-     *     - `SubscribeToTask` — Subscribe to task events via Server-Sent Events.
-     *     - `GetExtendedAgentCard` — Fetch the authenticated extended agent card.
-     */
-    post: operations["handle_requests__post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v1/chat/completions": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Chat */
-    post: operations["chat_v1_chat_completions_post"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v1/models": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Models */
-    get: operations["models_v1_models_get"];
     put?: never;
     post?: never;
     delete?: never;
@@ -232,42 +143,6 @@ export interface components {
       } | null;
     };
     /**
-     * ChatMessage
-     * @description One message of a request.
-     */
-    ChatMessage: {
-      /** Role */
-      role: string;
-      /** Content */
-      content?: string | components["schemas"]["ContentPart"][] | null;
-      /** Tool Call Id */
-      tool_call_id?: string | null;
-    };
-    /**
-     * ChatRequest
-     * @description The body of a chat-completions request.
-     */
-    ChatRequest: {
-      /**
-       * Model
-       * @default wfo
-       */
-      model?: string;
-      /** Messages */
-      messages?: components["schemas"]["ChatMessage"][];
-      /**
-       * Stream
-       * @default false
-       */
-      stream?: boolean;
-      /** Tools */
-      tools?:
-        | {
-            [key: string]: unknown;
-          }[]
-        | null;
-    };
-    /**
      * ChatSummary
      * @description A chat as the list shows it (``GET /chats/``).
      */
@@ -283,19 +158,6 @@ export interface components {
       updated_at: string;
       /** Form Open */
       form_open: boolean;
-    };
-    /**
-     * ContentPart
-     * @description One part of a message's content; only its text is read.
-     */
-    ContentPart: {
-      /**
-       * Type
-       * @default text
-       */
-      type?: string;
-      /** Text */
-      text?: string | null;
     };
     /** HTTPValidationError */
     HTTPValidationError: {
@@ -317,9 +179,9 @@ export interface components {
     };
     /**
      * ApprovalAnswer
-     * @description The payload that resolves a ``tool_call`` interrupt: the decision on the start, as AG-UI shapes an approval.
+     * @description The payload that resolves the interrupt: the decision on the start, as AG-UI shapes an approval.
      *
-     *     A rejection may say why, or what to change: the form reopens and the model acts on it.
+     *     A rejection may say why, or what to change: the model reads it and acts on it.
      */
     ApprovalAnswer: {
       /** Approved */
@@ -332,16 +194,25 @@ export interface components {
     };
     /**
      * ApprovalStop
-     * @description The metadata of a ``tool_call`` interrupt: the workflow start to approve.
+     * @description The start of a workflow as the person approves it: what a client shows on the approval.
+     *
+     *     ``values`` are what the accepted pages hold, each as the form shows it (an id is not something a person
+     *     can confirm); ``defaults`` the optional fields nobody gave a value; ``summary`` the tables of the
+     *     workflow's own summary page, when its form ends in one.
      */
     ApprovalStop: {
       /** Workflow Key */
       workflow_key: string;
-      tool: components["schemas"]["ToolCall"];
-      /** Form */
-      form: {
+      /** Values */
+      values?: {
         [key: string]: unknown;
-      } | null;
+      };
+      /** Defaults */
+      defaults?: {
+        [key: string]: unknown;
+      };
+      /** Summary */
+      summary?: components["schemas"]["SummaryTable"][];
     };
     /**
      * ChartData
@@ -402,6 +273,43 @@ export interface components {
       download_url: string;
     };
     /**
+     * FormActivity
+     * @description The content of a ``workflow_form`` activity message: where a workflow form stands.
+     */
+    FormActivity: {
+      /** Workflow Key */
+      workflow_key: string;
+      phase: components["schemas"]["FormPhase"];
+      /**
+       * Page
+       * @default null
+       */
+      page?: number | null;
+      /**
+       * Title
+       * @default null
+       */
+      title?: string | null;
+      /**
+       * Values
+       * @default {}
+       */
+      values?: {
+        [key: string]: unknown;
+      };
+      /**
+       * Calls
+       * @default []
+       */
+      calls?: string[];
+    };
+    /**
+     * FormPhase
+     * @description Where a form stands; the strings are the session's ``status`` as persisted.
+     * @enum {string}
+     */
+    FormPhase: "gathering" | "confirming" | "done";
+    /**
      * QueryArtifact
      * @description Lightweight reference returned by query tools.
      */
@@ -437,16 +345,19 @@ export interface components {
       content: string;
     };
     /**
-     * ToolCall
-     * @description The call the agent wants approved, as it will be made.
+     * SummaryTable
+     * @description One table of a workflow's own summary page, as pydantic-forms carries it (the shape of its ``SummaryData``).
+     *
+     *     A row per label and a column per item compared (before and after, for a modify), headed when the form
+     *     heads them.
      */
-    ToolCall: {
-      /** Name */
-      name: string;
-      /** Args */
-      args: {
-        [key: string]: unknown;
-      };
+    SummaryTable: {
+      /** Headers */
+      headers?: string[];
+      /** Labels */
+      labels?: string[];
+      /** Columns */
+      columns?: unknown[][];
     };
     /**
      * VisualizationType
@@ -465,220 +376,6 @@ export interface components {
        * @enum {string}
        */
       type?: "pie" | "line" | "table";
-    };
-    SendMessageRequest: {
-      /** @example  */
-      tenant?: string;
-      message?: components["schemas"]["Message"];
-      /** @example null */
-      configuration?: components["schemas"]["SendMessageConfiguration"] | null;
-      metadata?: Record<string, never>;
-    };
-    Message: {
-      /** @example message_id */
-      message_id?: string;
-      /** @example  */
-      context_id?: string;
-      /** @example  */
-      task_id?: string;
-      /**
-       * @example ROLE_USER
-       * @enum {string}
-       */
-      role?: "ROLE_UNSPECIFIED" | "ROLE_USER" | "ROLE_AGENT";
-      /**
-       * @example [
-       *       {
-       *         "text": ""
-       *       }
-       *     ]
-       */
-      parts?: components["schemas"]["Part"][];
-      metadata?: Record<string, never>;
-      /**
-       * @example [
-       *       ""
-       *     ]
-       */
-      extensions?: string[];
-      /**
-       * @example [
-       *       ""
-       *     ]
-       */
-      reference_task_ids?: string[];
-    };
-    /**
-     * @example {
-     *       "text": ""
-     *     }
-     */
-    Part: {
-      metadata?: Record<string, never>;
-      /** @example  */
-      filename?: string;
-      /** @example  */
-      media_type?: string;
-    } & (
-      | {
-          /** @example  */
-          text: string;
-        }
-      | {
-          /** Format: byte */
-          raw: string;
-        }
-      | {
-          /** @example  */
-          url: string;
-        }
-      | {
-          data: unknown;
-        }
-    );
-    SendMessageConfiguration: {
-      /**
-       * @example [
-       *       ""
-       *     ]
-       */
-      accepted_output_modes?: string[];
-      /** @example null */
-      task_push_notification_config?: components["schemas"]["TaskPushNotificationConfig"] | null;
-      /** Format: int32 */
-      history_length?: number;
-      /** @example false */
-      return_immediately?: boolean;
-    };
-    TaskPushNotificationConfig: {
-      /** @example  */
-      tenant?: string;
-      /** @example  */
-      id?: string;
-      /** @example  */
-      task_id?: string;
-      /** @example url */
-      url?: string;
-      /** @example  */
-      token?: string;
-      /** @example null */
-      authentication?: components["schemas"]["AuthenticationInfo"] | null;
-    };
-    AuthenticationInfo: {
-      /** @example scheme */
-      scheme?: string;
-      /** @example  */
-      credentials?: string;
-    };
-    GetTaskRequest: {
-      /** @example  */
-      tenant?: string;
-      /** @example id */
-      id?: string;
-      /** Format: int32 */
-      history_length?: number;
-    };
-    ListTasksRequest: {
-      /** @example  */
-      tenant?: string;
-      /** @example  */
-      context_id?: string;
-      /**
-       * @example TASK_STATE_SUBMITTED
-       * @enum {string}
-       */
-      status?:
-        | "TASK_STATE_UNSPECIFIED"
-        | "TASK_STATE_SUBMITTED"
-        | "TASK_STATE_WORKING"
-        | "TASK_STATE_COMPLETED"
-        | "TASK_STATE_FAILED"
-        | "TASK_STATE_CANCELED"
-        | "TASK_STATE_INPUT_REQUIRED"
-        | "TASK_STATE_REJECTED"
-        | "TASK_STATE_AUTH_REQUIRED";
-      /** Format: int32 */
-      page_size?: number;
-      /** @example  */
-      page_token?: string;
-      /** Format: int32 */
-      history_length?: number;
-      /** Format: date-time */
-      status_timestamp_after?: string;
-      /** @example false */
-      include_artifacts?: boolean;
-    };
-    CancelTaskRequest: {
-      /** @example  */
-      tenant?: string;
-      /** @example id */
-      id?: string;
-      metadata?: Record<string, never>;
-    };
-    GetTaskPushNotificationConfigRequest: {
-      /** @example  */
-      tenant?: string;
-      /** @example task_id */
-      task_id?: string;
-      /** @example id */
-      id?: string;
-    };
-    ListTaskPushNotificationConfigsRequest: {
-      /** @example  */
-      tenant?: string;
-      /** @example task_id */
-      task_id?: string;
-      /** Format: int32 */
-      page_size?: number;
-      /** @example  */
-      page_token?: string;
-    };
-    DeleteTaskPushNotificationConfigRequest: {
-      /** @example  */
-      tenant?: string;
-      /** @example task_id */
-      task_id?: string;
-      /** @example id */
-      id?: string;
-    };
-    SubscribeToTaskRequest: {
-      /** @example  */
-      tenant?: string;
-      /** @example id */
-      id?: string;
-    };
-    GetExtendedAgentCardRequest: {
-      /** @example  */
-      tenant?: string;
-    };
-    A2ARequest: {
-      /** @enum {string} */
-      jsonrpc: "2.0";
-      id?: string | number | null;
-      /** @enum {string} */
-      method:
-        | "SendMessage"
-        | "SendStreamingMessage"
-        | "GetTask"
-        | "ListTasks"
-        | "CancelTask"
-        | "CreateTaskPushNotificationConfig"
-        | "GetTaskPushNotificationConfig"
-        | "ListTaskPushNotificationConfigs"
-        | "DeleteTaskPushNotificationConfig"
-        | "SubscribeToTask"
-        | "GetExtendedAgentCard";
-      params?:
-        | components["schemas"]["SendMessageRequest"]
-        | components["schemas"]["GetTaskRequest"]
-        | components["schemas"]["ListTasksRequest"]
-        | components["schemas"]["CancelTaskRequest"]
-        | components["schemas"]["TaskPushNotificationConfig"]
-        | components["schemas"]["GetTaskPushNotificationConfigRequest"]
-        | components["schemas"]["ListTaskPushNotificationConfigsRequest"]
-        | components["schemas"]["DeleteTaskPushNotificationConfigRequest"]
-        | components["schemas"]["SubscribeToTaskRequest"]
-        | components["schemas"]["GetExtendedAgentCardRequest"];
     };
   };
   responses: never;
@@ -850,110 +547,6 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  _get_agent_card__well_known_agent_card_json_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  handle_requests__post: {
-    parameters: {
-      query?: never;
-      header: {
-        /** @example 1.0 */
-        "A2A-Version": "1.0";
-      };
-      path?: never;
-      cookie?: never;
-    };
-    /** @description A2A JSON-RPC 2.0 request */
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["A2ARequest"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  chat_v1_chat_completions_post: {
-    parameters: {
-      query?: never;
-      header?: {
-        "x-conversation-id"?: string | null;
-        "x-agent-client"?: string | null;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ChatRequest"];
-      };
-    };
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Validation Error */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
-  models_v1_models_get: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Successful Response */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
         };
       };
     };

@@ -277,6 +277,7 @@ export function WfoChat({
                         onResolve={(payload) =>
                           void chat.respond([{ interruptId: interrupt.id, status: "resolved", payload }])
                         }
+                        onTalk={send}
                       />
                     </div>
                   ))}
@@ -303,9 +304,12 @@ export function WfoChat({
                 <Composer
                   inputRef={input}
                   placeholder={
-                    chat.interrupts.length ? "Approve above, or say what to change" : "Ask the Workflow Orchestrator…"
+                    chat.interrupts.length
+                      ? "Respond to the approval above to continue"
+                      : "Ask the Workflow Orchestrator…"
                   }
                   running={chat.running}
+                  disabled={chat.interrupts.length > 0}
                   onSend={send}
                   onStop={chat.stop}
                 />

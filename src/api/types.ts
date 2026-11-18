@@ -19,9 +19,12 @@ export type ExportArtifact = Schemas["ExportArtifact"];
 export type RenderedBlock = Schemas["RenderedBlock"];
 export type ChartData = Schemas["ChartData"];
 export type ChartPoint = Schemas["ChartPoint"];
-/** What a ``tool_call`` interrupt carries in its metadata: the workflow start to approve. */
+/** The content of a ``workflow_form`` activity message: a workflow form while it is filled. */
+export type FormActivity = Schemas["FormActivity"];
+/** The ``activityType`` of that message. */
+export const FORM_ACTIVITY = "workflow_form";
+/** What the approval interrupt carries in its metadata: the workflow start as the person approves it. */
 export type ApprovalStop = Schemas["ApprovalStop"];
-export type ToolCall = Schemas["ToolCall"];
 /** The payload that resolves it: the decision, and what the person said when they did not approve. */
 export type ApprovalAnswer = Schemas["ApprovalAnswer"];
 

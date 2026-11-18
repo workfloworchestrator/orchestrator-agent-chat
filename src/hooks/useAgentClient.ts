@@ -99,9 +99,9 @@ export function useAgentClient({
       const agent = agentRef.current;
       const content = text.trim();
       if (!agent || !content || runningRef.current) return;
-      // A message while a start waits for approval is the person saying what to change: the start is
-      // rejected with their words, and the agent acts on them. The client will not start a run that leaves
-      // an interrupt unaddressed, so the rejection travels with the message, in the same run.
+      // While a start waits for approval the message box is closed; what the person writes under "Talk
+      // about this" comes here. It declines the start for now with their words, and the agent acts on them.
+      // The agent refuses a run that leaves the start unanswered, so the answer travels with the message.
       const rejected: ResumeEntry[] = agent.pendingInterrupts.map((pending) => ({
         interruptId: pending.id,
         status: "resolved",

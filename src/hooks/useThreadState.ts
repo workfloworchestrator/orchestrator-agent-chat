@@ -7,7 +7,7 @@ export interface ThreadState {
   history: Message[];
   /** This run's messages as they stream; they join the history when the run settles. */
   run: Message[];
-  /** The stops the last run ended on (a form page's questions, the start to approve), waiting for an answer. */
+  /** The stops the last run ended on (the start of a workflow to approve), waiting for an answer. */
   interrupts: Interrupt[];
   running: boolean;
   /** The thread's history is on its way. */

@@ -3,6 +3,8 @@
 const FOCUS = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-wfo-accent";
 const BUTTON = `appearance-none inline-flex cursor-pointer items-center justify-center gap-1.5 border-0 font-wfo text-sm ${FOCUS}`;
 
+/** A line of text that opens what is under it: a step's name, with the same focus ring as every control. */
+export const DISCLOSE = `appearance-none inline-flex cursor-pointer items-center gap-1 border-0 bg-transparent p-0 font-wfo text-xs leading-4 text-wfo-muted hover:text-wfo-ink ${FOCUS}`;
 export const PRIMARY = `${BUTTON} rounded-full bg-wfo-accent px-4 py-2 font-medium text-wfo-on-accent hover:bg-wfo-accent-strong disabled:cursor-default disabled:opacity-50`;
 export const GHOST = `${BUTTON} rounded-full bg-transparent px-3 py-2 text-wfo-muted hover:bg-wfo-surface hover:text-wfo-ink disabled:cursor-default disabled:opacity-50`;
 export const ICON_BUTTON = `${BUTTON} h-8 w-8 shrink-0 rounded-full bg-transparent p-0 text-wfo-muted hover:bg-wfo-surface hover:text-wfo-ink disabled:cursor-default disabled:opacity-50`;
