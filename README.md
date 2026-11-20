@@ -24,8 +24,11 @@ The popup renders inside a shadow root with its stylesheet, so the page's styles
 every element) do not reach it, and nothing of its own reaches the page. There is no stylesheet to import.
 
 The popup needs the agent's AG-UI route and its chats API, by default `/agui/` and `/chats` on the page's
-own origin: put a proxy in front of the page (the demo's nginx config is one), or point `agentUrl` at the
-agent and allow the origin there.
+own origin. For local development, the agent's demo has a
+[Vite proxy configuration](https://github.com/workfloworchestrator/orchestrator-agent/blob/main/demos/web/vite.config.js)
+that forwards both routes. For nginx and deployment setup, see the
+[agent chat setup guide](https://github.com/workfloworchestrator/orchestrator-agent/blob/main/docs/guides/chat-popup.md#proxy-setup).
+The Orchestrator Agent does not enable CORS by default, so use a same-origin proxy with its standard setup.
 
 | Prop           | What it does                                                                                   |
 | -------------- | ---------------------------------------------------------------------------------------------- |
